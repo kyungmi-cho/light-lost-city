@@ -1129,3 +1129,66 @@ html, body {
   opacity: 0.2 !important;
   background: transparent !important;
 }
+/* =====================================================
+   추가 수정: 모바일 가로 모드 (Landscape) 잘림 방지 및 동적 높이
+===================================================== */
+
+/* 실제 화면 높이에 맞춰 게임 컨테이너 꽉 채우기 */
+body, html {
+  height: 100%;
+  height: -webkit-fill-available;
+}
+#game-container {
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100); /* JS에서 계산한 실제 높이 적용 */
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+/* 화면 높이가 좁은 기기 (모바일 가로 모드) 전용 UI 대폭 축소 */
+@media (max-height: 500px) {
+  /* 타이틀 및 스플래시 로고 축소 */
+  .title-text { max-height: 40vh; }
+  .title-press { max-height: 12vh; }
+  
+  /* 배틀 화면 캐릭터 크기 및 위치 조정 */
+  .battle-player { height: clamp(70px, 45vh, 120px) !important; bottom: 8%; }
+  .battle-villain { height: clamp(70px, 45vh, 120px) !important; bottom: 12%; }
+  .battle-villain.boss { height: clamp(90px, 55vh, 160px) !important; bottom: 12%; }
+  
+  /* 배틀 상단 HP바 및 타이머 축소 */
+  .battle-header { top: 2%; gap: 1%; }
+  .hp-panel { padding: 2px 4px; border-width: 2px; }
+  .hp-name, .timer-label { font-size: 8px; margin-bottom: 0; }
+  .hp-text { font-size: 8px; }
+  .timer-panel { padding: 2px 6px; border-width: 2px; }
+  .timer-value { font-size: 14px; }
+  
+  /* 퀴즈 박스 (모달) 크기 압축 */
+  .quiz-box { padding: 2% 4%; max-height: 98vh; border-width: 3px; }
+  .quiz-question { font-size: clamp(11px, 4vh, 16px); margin-bottom: 8px; }
+  .quiz-ox { margin-bottom: 8px; }
+  .quiz-ox-btn { width: 15%; border-width: 2px; }
+  .quiz-option { padding: 4px; font-size: 11px; margin-bottom: 4px; }
+  
+  /* 콤보/이펙트 글씨 축소 */
+  .combo-display { font-size: 12px; bottom: 10%; }
+  .hit-effect { font-size: 16px; }
+  .hit-effect.crit { font-size: 20px; }
+  
+  /* 엔딩 및 보상 화면 축소 */
+  .master-badge { max-height: 35vh; }
+  .reward-msg { font-size: 11px; margin-top: 10px; }
+  #reward-final-btns { margin-top: 10px; }
+  #reward-final-btns button { padding: 8px 12px; font-size: 11px !important; }
+}
+/* 💡 화면 밀림, 새로고침(당기기), 주소창 짤림 완벽 방지 & 터치 먹통 해결 */
+html, body {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0; padding: 0;
+  overflow: hidden !important; 
+  touch-action: manipulation !important; 
+  -webkit-user-select: none !important; 
+  user-select: none !important;
+}

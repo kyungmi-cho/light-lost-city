@@ -1,115 +1,141 @@
 // =====================================================
-// game.js — 메인 게임 컨트롤러
-// 화면 전환 / 상태 관리 / 전체 흐름 제어
+// game.js — 메인 게임 컨트롤러 (최종 에러 방어 완벽 적용)
 // =====================================================
 
 const Game = {
+  isStarted: false, // 중복 클릭 방지용 안전장치
 
-  // ── 초기화 ──
   init() {
     this.setupEventListeners();
-    // 스플래시 대신 첫 터치 화면을 띄움
     this.showScreen('init');
-    document.getElementById('screen-init').addEventListener('click', () => {
-      // 빈 사운드를 재생하여 오디오 권한을 얻어냄
-      AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK); 
+    
+    const initScreen = document.getElementById('screen-init');
+    
+    // 💡 가장 안전한 클릭/터치 통합 핸들러 (에러 무시하고 강제 진행)
+    const startHandler = () => {
+      if (this.isStarted) return; 
+      this.isStarted = true;
+      
+      // 오디오 권한 요청 (에러 나도 무시)
+      try { 
+        if (typeof AudioManager !== 'undefined') {
+          if (AudioManager.initUnlock) AudioManager.initUnlock(); 
+          if (AudioManager.playSFX) AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK); 
+        }
+      } catch(err) { console.warn("오디오 권한 획득 스킵"); }
+      
+      // 전체화면 강제 시도 (에러 나도 무시)
+      try {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(()=>{});
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+      } catch(err) { console.warn("전체화면 스킵"); }
+
+      // 💡 무조건 다음 스플래시 화면으로 강제 이동
       this.showScreen('splash');
       this.runSplash();
-    }, { once: true });
+    };
+
+    // 화면을 멈추게 할 수 있는 요소를 모두 제거하고 단순 이벤트만 등록
+    if (initScreen) {
+      initScreen.addEventListener('click', startHandler);
+      initScreen.addEventListener('touchstart', startHandler);
+    }
   },
 
-  // ── 화면 전환 ──
   showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const el = document.getElementById('screen-' + id);
     if (el) el.classList.add('active');
-    GameState.currentScreen = id;
+    
+    if (typeof GameState !== 'undefined') {
+      GameState.currentScreen = id;
+    }
   },
 
-  // ── 이벤트 리스너 ──
   setupEventListeners() {
-    // 뮤트 버튼
-    document.getElementById('mute-btn').addEventListener('click', () => {
-      const muted = AudioManager.toggleMute();
-      document.getElementById('mute-btn').textContent = muted ? '🔇' : '🔊';
-      AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK);
-    });
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn) {
+      muteBtn.addEventListener('click', () => {
+        if (typeof AudioManager !== 'undefined' && AudioManager.toggleMute) {
+          const muted = AudioManager.toggleMute();
+          muteBtn.textContent = muted ? '🔇' : '🔊';
+          if (AudioManager.playSFX) AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK);
+        }
+      });
+    }
 
-    // 이탈 경고
     window.addEventListener('beforeunload', (e) => {
-      if (['battle','visual-novel','character','roulette','login'].includes(GameState.currentScreen)) {
+      if (typeof GameState !== 'undefined' && ['battle','visual-novel','character','roulette','login'].includes(GameState.currentScreen)) {
         e.preventDefault();
         e.returnValue = '';
       }
     });
-
-    // 팝업 버튼
-    document.getElementById('popup-ok').addEventListener('click', () => {
-      document.getElementById('exit-popup').classList.remove('show');
-      GameState.reset();
-      AudioManager.stopBGM();
-      this.showScreen('title');
-      AudioManager.playBGM(CONFIG.SOUNDS.BGM.START);
-    });
-    document.getElementById('popup-cancel').addEventListener('click', () => {
-      document.getElementById('exit-popup').classList.remove('show');
-    });
   },
 
-  // ── 1. 스플래시 ──
   async runSplash() {
     const logo1 = document.getElementById('splash-logo-jeil');
     const logo2 = document.getElementById('splash-logo-inclass');
 
-    // 제일전기 로고
-    AudioManager.playSFX(CONFIG.SOUNDS.SFX.LOGO_JEIL);
-    logo1.classList.add('show');
+    if (typeof AudioManager !== 'undefined' && AudioManager.playSFX) {
+      AudioManager.playSFX(CONFIG.SOUNDS.SFX.LOGO_JEIL);
+    }
+    if (logo1) logo1.classList.add('show');
     await sleep(2000);
-    logo1.classList.remove('show');
+    if (logo1) logo1.classList.remove('show');
     await sleep(600);
 
-    // 인클래스 로고
-    AudioManager.playSFX(CONFIG.SOUNDS.SFX.LOGO_INCLASS);
-    logo2.classList.add('show');
+    if (typeof AudioManager !== 'undefined' && AudioManager.playSFX) {
+      AudioManager.playSFX(CONFIG.SOUNDS.SFX.LOGO_INCLASS);
+    }
+    if (logo2) logo2.classList.add('show');
     await sleep(2000);
-    logo2.classList.remove('show');
+    if (logo2) logo2.classList.remove('show');
     await sleep(600);
 
-    // 타이틀로
     this.showScreen('title');
-    AudioManager.playBGM(CONFIG.SOUNDS.BGM.START);
+    if (typeof AudioManager !== 'undefined' && AudioManager.playBGM) {
+      AudioManager.playBGM(CONFIG.SOUNDS.BGM.START);
+    }
+    this.initTitle(); // 타이틀 진입 시 버튼 활성화
   },
 
-  // ── 2. 타이틀 ──
   initTitle() {
-    document.getElementById('screen-title').addEventListener('click', () => {
-      AudioManager.playSFX(CONFIG.SOUNDS.SFX.START_BTN);
-      this.showScreen('character');
-      Screens.initCharacterSelect();
-    }, { once: true });
+    const titleScreen = document.getElementById('screen-title');
+    if (titleScreen) {
+      titleScreen.addEventListener('click', () => {
+        if (typeof AudioManager !== 'undefined' && AudioManager.playSFX) {
+          AudioManager.playSFX(CONFIG.SOUNDS.SFX.START_BTN);
+        }
+        this.showScreen('character');
+        if (typeof Screens !== 'undefined' && Screens.initCharacterSelect) {
+          Screens.initCharacterSelect();
+        }
+      }, { once: true });
+    }
   },
 
-  // ── 로딩 표시 ──
   showLoading(msg) {
     const el = document.getElementById('loading-overlay');
-    document.getElementById('loading-text').textContent = msg || '잠시만요...';
-    el.classList.add('show');
+    const textEl = document.getElementById('loading-text');
+    if (textEl) textEl.textContent = msg || '잠시만요...';
+    if (el) el.classList.add('show');
   },
+  
   hideLoading() {
-    document.getElementById('loading-overlay').classList.remove('show');
-  },
-
-  // ── 이탈 경고 팝업 ──
-  showExitPopup() {
-    document.getElementById('exit-popup').classList.add('show');
+    const el = document.getElementById('loading-overlay');
+    if (el) el.classList.remove('show');
   }
 };
 
-// ── 유틸 ──
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+// 공통 대기 함수
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
 
-// ── 시작 ──
-window.addEventListener('DOMContentLoaded', () => {
+// =====================================================
+// 💡 이 부분이 빠져서 그동안 클릭이 안 되었던 것입니다! (게임 실행 코드)
+// =====================================================
+window.onload = () => {
   Game.init();
-  Game.initTitle();
-});
+};

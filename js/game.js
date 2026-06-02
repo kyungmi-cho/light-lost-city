@@ -5,41 +5,44 @@
 const Game = {
   isStarted: false, // 중복 클릭 방지용 안전장치
 
+  // ── 초기화 ──
   init() {
     this.setupEventListeners();
     this.showScreen('init');
     
     const initScreen = document.getElementById('screen-init');
     
-    // 💡 가장 안전한 클릭/터치 통합 핸들러 (에러 무시하고 강제 진행)
-    const startHandler = () => {
+    // 💡 이벤트 중복 실행(오디오 겹침) 완벽 차단 핸들러
+    const startHandler = (e) => {
+      // 모바일에서 touchstart가 발생하면 뒤따라오는 click을 무시하도록 처리
+      if (e && e.type === 'touchstart') {
+        e.preventDefault(); 
+      }
+      
       if (this.isStarted) return; 
       this.isStarted = true;
       
-      // 오디오 권한 요청 (에러 나도 무시)
       try { 
         if (typeof AudioManager !== 'undefined') {
           if (AudioManager.initUnlock) AudioManager.initUnlock(); 
           if (AudioManager.playSFX) AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK); 
         }
-      } catch(err) { console.warn("오디오 권한 획득 스킵"); }
+      } catch(err) {}
       
-      // 전체화면 강제 시도 (에러 나도 무시)
       try {
         const docEl = document.documentElement;
         if (docEl.requestFullscreen) docEl.requestFullscreen().catch(()=>{});
         else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
-      } catch(err) { console.warn("전체화면 스킵"); }
+      } catch(err) {}
 
-      // 💡 무조건 다음 스플래시 화면으로 강제 이동
       this.showScreen('splash');
       this.runSplash();
     };
 
-    // 화면을 멈추게 할 수 있는 요소를 모두 제거하고 단순 이벤트만 등록
     if (initScreen) {
+      // 터치와 클릭을 모두 걸어두되, 터치가 작동하면 클릭은 방어되도록 설계
+      initScreen.addEventListener('touchstart', startHandler, { passive: false });
       initScreen.addEventListener('click', startHandler);
-      initScreen.addEventListener('touchstart', startHandler);
     }
   },
 

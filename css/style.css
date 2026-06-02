@@ -1277,3 +1277,28 @@ html, body {
   /* 💡 iOS에서 부드러운 터치 스크롤링 활성화 */
   -webkit-overflow-scrolling: touch !important; 
 }
+/* =====================================================
+   📱 비주얼 노벨 대화창 텍스트 최적화 (모바일 짤림 방지)
+===================================================== */
+@media (max-height: 600px) {
+  .vn-text-area {
+    /* 텍스트가 표시될 안전 영역 확보 (상황에 맞게 % 조절 가능) */
+    padding: 3% 5% !important; 
+    box-sizing: border-box !important;
+    max-height: 100% !important;
+    overflow-y: auto !important; /* 만약 대사가 너무 길면 텍스트 영역 안에서 스크롤되도록 방어 */
+  }
+  
+  .vn-speaker {
+    /* 화면 높이에 비례하여 이름표 크기 축소 (최소 12px ~ 최대 16px) */
+    font-size: clamp(12px, 4vh, 16px) !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .vn-text {
+    /* 화면 높이에 비례하여 대사 크기 축소 (최소 11px ~ 최대 14px) */
+    font-size: clamp(11px, 3.5vh, 14px) !important;
+    line-height: 1.4 !important; 
+    word-break: keep-all !important; /* 단어가 중간에 잘려서 줄바꿈되는 현상 방지 */
+  }
+}

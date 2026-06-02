@@ -519,8 +519,14 @@ html, body {
   width: auto;
   object-fit: contain;
 }
+/* =====================================================
+   추가 수정: 보스 크기 및 보상 화면 명패 효과
+===================================================== */
+
+/* PC 환경 보스 크기 대폭 확대 */
 .battle-villain.boss {
-  height: clamp(120px, 28vh, 360px);
+  height: clamp(180px, 45vh, 450px) !important;
+  bottom: 25%;
 }
 
 /* 콤보 */
@@ -622,9 +628,11 @@ html, body {
 .quiz-option.wrong    { background: rgba(231,76,60,0.3);  border-color: var(--c-red);   color: #ff9999; }
 .quiz-option:disabled { cursor: not-allowed; }
 
-/* OX 버튼 */
+/* =====================================================
+   수정: OX 버튼 (3번 문제 해결 - 배경색 및 가시성 개선)
+===================================================== */
 .quiz-ox {
-  display: flex; gap: 4%; justify-content: center;
+  display: flex; gap: 8%; justify-content: center; /* 간격 넓힘 */
   margin-bottom: 16px;
 }
 .quiz-ox-btn {
@@ -635,14 +643,18 @@ html, body {
   font-size: clamp(24px, 5vw, 60px);
   cursor: pointer;
   transition: all 0.15s;
-  background: transparent;
+  /* 기본 배경을 살짝 어둡게 깔아 글씨와 배경이 안 겹치게 함 */
+  background: rgba(0, 0, 0, 0.5); 
 }
 .quiz-ox-btn.o { border-color: var(--c-green); color: var(--c-green); }
 .quiz-ox-btn.x { border-color: var(--c-red);   color: var(--c-red); }
-.quiz-ox-btn:hover:not(:disabled) { transform: scale(1.1); }
-.quiz-ox-btn.correct { background: rgba(39,174,96,0.3); }
-.quiz-ox-btn.wrong   { background: rgba(231,76,60,0.3); }
-.quiz-ox-btn:disabled { cursor: not-allowed; }
+
+.quiz-ox-btn:hover:not(:disabled) { transform: scale(1.1); background: rgba(255, 255, 255, 0.1); }
+
+/* 정답/오답 클래스가 명확히 적용되도록 강제(!important) 적용 */
+.quiz-ox-btn.correct { background: rgba(39, 174, 96, 0.8) !important; color: #fff !important; border-color: #fff !important; }
+.quiz-ox-btn.wrong   { background: rgba(231, 76, 60, 0.8) !important; color: #fff !important; border-color: #fff !important; }
+.quiz-ox-btn:disabled { cursor: not-allowed; opacity: 0.7; }
 
 /* 힌트 버튼 */
 .quiz-hint-btn {
@@ -1025,8 +1037,95 @@ html, body {
 .tutorial-box p {
   word-break: keep-all !important;
 }
-/* 반응형 */
+/* =====================================================
+   수정: 반응형 모바일 최적화 (5번 문제 해결)
+===================================================== */
 @media (max-width: 640px) {
+  /* 캐릭터 카드 최적화 */
   .char-desc { display: none; }
-  .vn-portrait { width: clamp(60px, 18vw, 100px); height: clamp(60px, 18vw, 100px); }
+  .char-name { font-size: 11px; }
+  .char-card img { max-height: 20vh; }
+  
+  /* 비주얼 노벨 최적화 */
+  .vn-portrait { width: clamp(50px, 15vw, 80px); height: clamp(50px, 15vw, 80px); padding: 2%; }
+  .vn-speaker { font-size: 12px !important; }
+  .vn-text { font-size: 13px !important; line-height: 1.4 !important; }
+  
+  /* 배틀 화면 캐릭터 및 UI 축소 */
+  .battle-player { height: clamp(80px, 20vh, 150px); bottom: 20%; left: 10%; }
+  .battle-villain { height: clamp(70px, 18vh, 140px); bottom: 25%; right: 10%; }
+  .battle-villain.boss { height: clamp(90px, 22vh, 160px); }
+  
+  /* 콤보 및 텍스트 이펙트 축소 */
+  .combo-display { font-size: 16px; bottom: 15%; }
+  .hit-effect { font-size: 20px; }
+  .hit-effect.crit { font-size: 24px; }
+  
+  /* HP 및 타이머 UI 축소 */
+  .hp-panel { padding: 4px 8px; min-width: 32%; }
+  .hp-name { font-size: 10px; margin-bottom: 2px; }
+  .hp-text { font-size: 9px; }
+  .timer-panel { padding: 4px 10px; }
+  .timer-label { font-size: 9px; }
+  .timer-value { font-size: 18px; }
+  .lives-panel { padding: 4px 8px; }
+  .life-icon { font-size: 12px; }
+  
+  /* 퀴즈 모달 최적화 */
+  .quiz-box { padding: 4% 5%; max-height: 90%; }
+  .quiz-question { font-size: 13px; margin-bottom: 12px; }
+  .quiz-ox-btn { font-size: 24px; }
+  
+  /* 각종 타이틀 폰트 축소 */
+  .clear-title, .gameover-title { font-size: 24px; }
+  .clear-stat, .gameover-msg { font-size: 12px; }
+}
+/* 명패(배지) 후광 애니메이션 */
+@keyframes glowBadge {
+  0% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 35px rgba(255,215,0,1)); transform: scale(1.02); }
+  100% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.4)); transform: scale(1); }
+}
+.master-badge.glow {
+  animation: glowBadge 2.5s infinite ease-in-out;
+}
+
+/* 모바일 환경 보스 크기 조정 (기존 반응형 코드 안이나 맨 아래에 추가) */
+@media (max-width: 640px) {
+  .battle-villain.boss {
+    height: clamp(130px, 35vh, 220px) !important;
+  }
+}
+/* =====================================================
+   수정: OX 버튼 호버 & 정답/오답 불빛 제어 (대소문자 완벽 대응)
+===================================================== */
+
+/* 기본 테두리 및 글자색 (JS에서 대문자로 덮어씌워져도 색상 유지) */
+.quiz-ox-btn.o, .quiz-ox-btn.O { border-color: var(--c-green); color: var(--c-green); }
+.quiz-ox-btn.x, .quiz-ox-btn.X { border-color: var(--c-red);   color: var(--c-red); }
+
+/* 호버(마우스 오버) 시 O는 초록, X는 빨강 배경색 띄우기 */
+.quiz-ox-btn.o:hover:not(:disabled), .quiz-ox-btn.O:hover:not(:disabled) { 
+  background: rgba(39, 174, 96, 0.4); 
+}
+.quiz-ox-btn.x:hover:not(:disabled), .quiz-ox-btn.X:hover:not(:disabled) { 
+  background: rgba(231, 76, 60, 0.4); 
+}
+
+/* 정답인 버튼은 강하게 불이 들어오며 텍스트 흰색으로 변경 */
+.quiz-ox-btn.o.highlight-answer, .quiz-ox-btn.O.highlight-answer { 
+  background: rgba(39, 174, 96, 0.9) !important; 
+  color: #fff !important; 
+  border-color: #fff !important; 
+}
+.quiz-ox-btn.x.highlight-answer, .quiz-ox-btn.X.highlight-answer { 
+  background: rgba(231, 76, 60, 0.9) !important; 
+  color: #fff !important; 
+  border-color: #fff !important; 
+}
+
+/* 오답/선택받지 못한 버튼은 투명도를 낮춰서 불이 꺼진 것처럼 연출 */
+.quiz-ox-btn.dimmed {
+  opacity: 0.2 !important;
+  background: transparent !important;
 }

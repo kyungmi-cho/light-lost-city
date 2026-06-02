@@ -17,7 +17,11 @@ const Battle = {
     Game.hideLoading();
 
     // 💡 대화 시작 전, 빌런 등장부터 배틀 브금을 웅장하게 미리 재생
-    AudioManager.playBGM(CONFIG.SOUNDS.BGM.BATTLE);
+    if (level === 4) {
+      AudioManager.playBGM(CONFIG.SOUNDS.BGM.BOSS); // Lv.4는 보스 BGM
+    } else {
+      AudioManager.playBGM(CONFIG.SOUNDS.BGM.BATTLE); // 나머지는 일반 배틀 BGM
+    }
 
     VisualNovel.playVillainIntro(level, bg, async () => {
       Game.showLoading('전투 준비 중...');
@@ -237,29 +241,35 @@ const Battle = {
   },
 
   // ── 정답 제출 ──
+  // ── 정답 제출 ──
   async submitAnswer(answer, q, btn) {
     const isCorrect = answer === q.answer;
 
-    // 👇 퀴즈 버튼을 누른 즉시 정답/오답 사운드를 먼저 재생 (추가)
     AudioManager.playSFX(isCorrect ? CONFIG.SOUNDS.SFX.CORRECT : CONFIG.SOUNDS.SFX.INCORRECT);
     
-    // 버튼 비활성화 (기존 코드 시작...)
+    // 버튼 비활성화
     document.querySelectorAll('.quiz-option, .quiz-ox-btn').forEach(b => b.disabled = true);
-    /* ... 이하 기존 로직 동일 ... */
 
-    // 정오답 표시
+    // 정오답 표시 (안전장치 추가)
     if (q.type === 'O/X') {
       const btns = document.querySelectorAll('.quiz-ox-btn');
+      
+      // 💡 시트 데이터의 공백을 제거하고 무조건 대문자로 변환하여 비교
+      const correctAns = String(q.answer).trim().toUpperCase(); 
+      
       btns.forEach(b => {
-        if (b.dataset.val === q.answer) b.classList.add('correct');
-        else b.classList.add('wrong');
+        if (b.dataset.val === correctAns) {
+          b.classList.add('highlight-answer'); // 정답 점등
+        } else {
+          b.classList.add('dimmed'); // 오답 소등
+        }
       });
     } else if (btn) {
+      // (이하 객관식 로직 기존과 동일)
       btn.classList.add(isCorrect ? 'correct' : 'wrong');
       if (!isCorrect) {
-        // 정답 표시
         document.querySelectorAll('.quiz-option').forEach((b, i) => {
-          if (String(i+1) === q.answer) b.classList.add('correct');
+          if (String(i+1) === String(q.answer).trim()) b.classList.add('correct');
         });
       }
     }
@@ -348,31 +358,34 @@ const Battle = {
 
   // ── 오답 처리 ──
   async onWrong(q) {
-  
     GameState.battle.combo = 0;
     GameState.battle.turn++;
 
-    // 👇 플레이어의 공격 헛스윙(Miss) 사운드 추가
+    // 💡 1. 플레이어 공격 애니메이션 (헛스윙)
+    const playerImg = document.getElementById('battle-player-img');
+    playerImg.src = CONFIG.IMAGES.PLAYER[GameState.character].attack;
+    
+    // 휙~ (Miss) 사운드 재생
     AudioManager.playSFX(CONFIG.SOUNDS.SFX.MISS);
 
-    // 💡 오답 사운드가 끝날 수 있도록 0.4초 대기 후 빌런 반격 시퀀스 시작
-    await sleep(400);
+    await sleep(400); // 헛스윙 동작 대기
     
+    // 원상복구
+    playerImg.src = CONFIG.IMAGES.PLAYER[GameState.character].idle;
 
-    // Lv.4 오답 시 HP 회복
+    // 💡 2. 적 방향('right')에 MISS 이펙트 띄우기 (HP 변화 없음)
     if (GameState.currentLevel === 4) {
-    /* ... (이하 기존 코드 유지) ... */
       const recover = CONFIG.LEVELS[4].hpRecoverOnWrong;
       GameState.villain.hp = Math.min(GameState.villain.maxHp, GameState.villain.hp + recover);
-      this.showHitEffect(`+${recover}HP`, 'miss', 'right');
+      this.showHitEffect(`MISS! (+${recover}HP)`, 'miss', 'right'); // 'right'로 변경
       this.updateHPBars();
       await sleep(600);
     } else {
-      this.showHitEffect('MISS!', 'miss', 'left');
+      this.showHitEffect('MISS!', 'miss', 'right'); // 'right'로 변경
       await sleep(600);
     }
 
-    // 빌런 반격
+    // 3. 빌런 반격
     await this.villainAttack();
   },
 

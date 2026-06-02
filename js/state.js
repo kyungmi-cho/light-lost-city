@@ -16,6 +16,7 @@ const GameState = {
   // 게임 진행
   lives: 3,
   currentLevel: 1,
+  gameStartTime: null, // 💡 플레이 타임 측정용 변수 추가
 
   // 플레이어 전투 스탯
   player: {
@@ -51,6 +52,7 @@ const GameState = {
     this.character = null;
     this.lives = CONFIG.GAME.BASE_LIVES;
     this.currentLevel = 1;
+    this.gameStartTime = null; // 💡 초기화 로직에 추가
     this.resetPlayerStats();
   },
 

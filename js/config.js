@@ -3,7 +3,7 @@
 // =====================================================
 
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbyUUciVmojRBiY8t6PBVXWUGVNc3PuNHPQO-xIIyZyMr6sgK6iUMXZIxGncu2MF9IY/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbxRLoWOAREiE9QHG7XHIWymDX6uErjPNS3KI_naY6lHLRc46PfTbT6badNJyxhhGPBsxg/exec',
 
   GAME: {
     BASE_LIVES: 3,
@@ -84,6 +84,7 @@ const CONFIG = {
       CHARACTER_SELECT: 'audio/SFX_caracter.mp3',
       OPENING: 'sounds/bgm/BGM_OPENING.wav',
       BATTLE:  'sounds/bgm/BGM_BATTLE.mp3',
+      BOSS:    'sounds/bgm/BGM_BOSS_BATTLE.mp3',
       ENDING:  'sounds/bgm/BGM_ENDING.mp3',
     },
     SFX: {

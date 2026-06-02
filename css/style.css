@@ -1,0 +1,1032 @@
+/* =====================================================
+   빛을 잃은 도시 : 전기도둑 토벌전 — 전체 스타일
+   폰트: Neo둥근모 (한글) + Press Start 2P (영문/숫자)
+===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@font-face {
+  font-family: 'neodgm';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.3/NeoDunggeunmo.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ── 변수 ── */
+:root {
+  --c-dark:    #0a0a1a;
+  --c-navy:    #1A1A2E;
+  --c-gold:    #FFD700;
+  --c-orange:  #E8820C;
+  --c-blue:    #4A6FE3;
+  --c-green:   #27AE60;
+  --c-red:     #E74C3C;
+  --c-purple:  #8E44AD;
+  --c-white:   #FFFFFF;
+  --c-gray:    #888888;
+  --hp-green:  #2ECC71;
+  --hp-yellow: #F1C40F;
+  --hp-red:    #E74C3C;
+  --font-ko:   'neodgm', monospace;
+  --font-en:   'Press Start 2P', monospace;
+}
+
+/* ── 리셋 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--c-dark);
+  font-family: var(--font-ko);
+  color: var(--c-white);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── 게임 컨테이너 (항상 16:9) ── */
+#game-container {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw; height: 56.25vw;
+  max-height: 100vh;
+  max-width: 177.78vh;
+  overflow: hidden;
+  background: var(--c-dark);
+}
+
+/* ── 화면 공통 ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
+.screen:not(.active) { display: none !important; } /* active가 없는 모든 화면을 강제로 완벽히 숨김 */
+.screen.active { display: block; }
+
+/* 배경 이미지 공통 */
+.bg-fill {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center bottom;
+  width: 100%; height: 100%;
+}
+
+/* =====================================================
+   1. 스플래시 화면
+===================================================== */
+#screen-splash {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#screen-splash.active { display: flex; }
+.splash-logo {
+  position: absolute;
+  max-width: 50%;
+  max-height: 30%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.splash-logo.show { opacity: 1; }
+/* 👇 여기에 그대로 붙여넣기 */
+#splash-logo-inclass {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px 30px;
+  border-radius: 12px;
+}
+
+/* =====================================================
+   2. 타이틀 화면
+===================================================== */
+#screen-title { cursor: pointer; }
+#screen-title .bg-fill { background-position: center center; }
+.title-layer {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.title-text-layer { opacity: 0; animation: fadeIn 1.5s ease 0.5s forwards; }
+.title-press-layer {
+  opacity: 0;
+  animation: fadeIn 0.5s ease 2s forwards, blink 1s step-end 2.5s infinite;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* =====================================================
+   3. 캐릭터 선택 화면
+===================================================== */
+#screen-character {
+  background: linear-gradient(180deg, #0a0a2a 0%, #1a0a3a 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#screen-character.active { display: flex; }
+.char-select-title {
+  font-family: var(--font-ko);
+  font-size: clamp(14px, 2.5vw, 28px);
+  color: var(--c-gold);
+  margin-bottom: 2%;
+  text-shadow: 0 0 20px rgba(255,215,0,0.5);
+}
+.char-cards {
+  display: flex; gap: 3%;
+  align-items: flex-end; justify-content: center;
+  width: 90%;
+}
+.char-card {
+  flex: 1; max-width: 28%;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,215,0,0.3);
+  border-radius: 8px;
+  padding: 4% 3%;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.char-card:hover, .char-card.selected {
+  border-color: var(--c-gold);
+  background: rgba(255,215,0,0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255,215,0,0.3);
+}
+.char-card img {
+  width: 100%; height: auto;
+  max-height: 30vh;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.char-name {
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.5vw, 16px);
+  color: var(--c-white);
+  margin-top: 8px;
+}
+.char-desc {
+  font-family: var(--font-ko);
+  font-size: clamp(8px, 1vw, 12px);
+  color: var(--c-gray);
+  margin-top: 4px;
+  line-height: 1.6;
+}
+.char-select-btn {
+  margin-top: 3%;
+  padding: 1.5% 6%;
+  background: var(--c-gold);
+  color: var(--c-dark);
+  border: none;
+  font-family: var(--font-ko);
+  font-size: clamp(12px, 1.8vw, 20px);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.char-select-btn:hover { background: #FFA500; transform: scale(1.05); }
+.char-select-btn:disabled { background: var(--c-gray); cursor: not-allowed; }
+
+/* =====================================================
+   4. 닉네임 룰렛 화면
+===================================================== */
+#screen-roulette {
+  background: linear-gradient(180deg, #0a0a2a 0%, #1a1a3a 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3%;
+}
+#screen-roulette.active { display: flex; }
+.roulette-title {
+  font-family: var(--font-ko);
+  font-size: clamp(14px, 2.5vw, 28px);
+  color: var(--c-gold);
+  text-shadow: 0 0 20px rgba(255,215,0,0.5);
+}
+.roulette-display {
+  background: rgba(0,0,0,0.5);
+  border: 2px solid var(--c-gold);
+  border-radius: 8px;
+  padding: 2% 5%;
+  min-width: 50%;
+  text-align: center;
+  min-height: 8vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.roulette-name {
+  font-family: var(--font-ko);
+  font-size: clamp(16px, 3vw, 36px);
+  color: var(--c-white);
+  transition: all 0.1s;
+}
+.roulette-name.spinning { color: var(--c-gold); animation: flicker 0.1s infinite; }
+@keyframes flicker { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.roulette-btns { display: flex; gap: 2%; }
+.btn-spin, .btn-confirm {
+  padding: 1.5% 4%;
+  border: none; border-radius: 4px;
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.5vw, 18px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-spin { background: var(--c-blue); color: var(--c-white); }
+.btn-spin:hover { background: #3a5fd3; transform: scale(1.05); }
+.btn-confirm { background: var(--c-green); color: var(--c-white); }
+.btn-confirm:hover { background: #1e9e50; transform: scale(1.05); }
+.btn-confirm:disabled { background: var(--c-gray); cursor: not-allowed; }
+
+/* =====================================================
+   5. 로그인 게이트웨이
+===================================================== */
+#screen-login {
+  background: rgba(10,10,26,0.97);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2%;
+}
+#screen-login.active { display: flex; }
+.login-box {
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,215,0,0.4);
+  border-radius: 12px;
+  padding: 4% 5%;
+  width: min(500px, 80%);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.login-title {
+  font-family: var(--font-ko);
+  font-size: clamp(12px, 2vw, 22px);
+  color: var(--c-gold);
+  text-align: center;
+}
+.login-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  color: var(--c-white);
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.5vw, 16px);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.login-input:focus { border-color: var(--c-gold); }
+.login-input::placeholder { color: var(--c-gray); }
+.marketing-row {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ko);
+  font-size: clamp(9px, 1.2vw, 14px);
+  color: var(--c-gray);
+  cursor: pointer;
+}
+.marketing-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--c-gold); }
+.marketing-badge {
+  background: var(--c-orange);
+  color: var(--c-white);
+  font-size: clamp(8px, 1vw, 11px);
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 4px;
+}
+.btn-start-journey {
+  width: 100%;
+  padding: 14px;
+  background: var(--c-gold);
+  color: var(--c-dark);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-ko);
+  font-size: clamp(12px, 1.8vw, 20px);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.btn-start-journey:hover { background: #FFA500; transform: scale(1.02); }
+.btn-guest {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  color: var(--c-gray);
+  border: 1px solid var(--c-gray);
+  border-radius: 6px;
+  font-family: var(--font-ko);
+  font-size: clamp(9px, 1.2vw, 14px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-guest:hover { color: var(--c-white); border-color: var(--c-white); }
+
+/* =====================================================
+   6. 비주얼 노벨 (오프닝/대화)
+===================================================== */
+#screen-visual-novel {
+  cursor: pointer;
+}
+.vn-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: background-image 0.5s; }
+.vn-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+.vn-dialog-wrap {
+  position: absolute;
+  bottom: 3%;
+  left: 50%; transform: translateX(-50%);
+  width: 92%;
+  display: flex; flex-direction: column; gap: 0;
+}
+.vn-dialog-frame {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  background: rgba(0,0,0,0.0);
+}
+.vn-frame-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  /* object-fit: fill; 삭제 완료 */
+  image-rendering: pixelated; 
+}
+.vn-text-area {
+  position: relative; z-index: 2;
+  padding: 4.5% 8% 5% 10%; /* 패딩 수정 완료 */
+  min-height: 12vh;
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+/* 👇 배경 스탠딩 캐릭터용으로 새로 추가 */
+.vn-bg-char {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 65%;
+  object-fit: contain;
+  opacity: 0.85; 
+  z-index: 1;
+  display: none;
+  image-rendering: pixelated;
+}
+.vn-speaker {
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.4vw, 16px);
+  color: var(--c-gold);
+  margin-bottom: 6px;
+}
+.vn-text {
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.6vw, 18px);
+  color: var(--c-white);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.vn-portrait {
+  position: relative; z-index: 2;
+  width: clamp(80px, 12vw, 160px);
+  height: clamp(80px, 12vw, 160px);
+  padding: 5% 6% 6% 2%;
+  display: flex; align-items: center; justify-content: center;
+}
+.vn-portrait img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.vn-next-arrow {
+  position: absolute;
+  bottom: 8px; right: 16px;
+  font-size: clamp(10px, 1.2vw, 16px);
+  color: var(--c-gold);
+  animation: blink 0.8s step-end infinite;
+  z-index: 3;
+}
+.vn-skip-btn {
+  position: absolute;
+  top: 2%; right: 2%;
+  background: rgba(0,0,0,0.5);
+  color: var(--c-gray);
+  border: 1px solid var(--c-gray);
+  padding: 6px 12px;
+  font-family: var(--font-ko);
+  font-size: clamp(9px, 1vw, 12px);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.vn-skip-btn:hover { color: var(--c-white); }
+
+/* =====================================================
+   7. 배틀 화면
+===================================================== */
+#screen-battle
+.battle-bg { position: absolute; inset: 0; background-size: cover; background-position: center bottom; }
+
+/* HP바 영역 */
+.battle-ui-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 2% 3%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 10;
+}
+.hp-panel {
+  background: rgba(0,0,0,0.65);
+  border: 2px solid rgba(255,215,0,0.4);
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 28%;
+}
+.hp-name {
+  font-family: var(--font-ko);
+  font-size: clamp(9px, 1.3vw, 15px);
+  color: var(--c-gold);
+  margin-bottom: 4px;
+}
+.hp-bar-wrap {
+  width: 100%; height: 12px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 6px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.hp-bar {
+  height: 100%;
+  background: var(--hp-green);
+  border-radius: 6px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+.hp-bar.yellow { background: var(--hp-yellow); }
+.hp-bar.red    { background: var(--hp-red); animation: hpPulse 0.5s ease infinite; }
+@keyframes hpPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.hp-text {
+  font-family: var(--font-en);
+  font-size: clamp(8px, 1vw, 12px);
+  color: var(--c-white);
+  margin-top: 2px;
+}
+
+/* 타이머 */
+.timer-panel {
+  background: rgba(0,0,0,0.65);
+  border: 2px solid rgba(255,215,0,0.4);
+  border-radius: 8px;
+  padding: 8px 16px;
+  text-align: center;
+}
+.timer-label {
+  font-family: var(--font-ko);
+  font-size: clamp(8px, 1vw, 12px);
+  color: var(--c-gray);
+}
+.timer-value {
+  font-family: var(--font-en);
+  font-size: clamp(16px, 3vw, 40px);
+  color: var(--c-white);
+  transition: color 0.3s;
+}
+.timer-value.warning { color: var(--c-red); animation: hpPulse 0.5s ease infinite; }
+
+/* 목숨 */
+.lives-panel {
+  display: flex; gap: 4px; align-items: center;
+  background: rgba(0,0,0,0.65);
+  border: 2px solid rgba(255,215,0,0.4);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.life-icon { font-size: clamp(12px, 2vw, 24px); }
+.life-icon.empty { opacity: 0.2; }
+
+/* 캐릭터 스프라이트 */
+.battle-player {
+  position: absolute;
+  bottom: 28%;
+  left: 15%; /* 5%에서 15%로 당김 */
+  z-index: 5;
+  image-rendering: pixelated;
+  height: clamp(150px, 30vh, 350px); /* 전체적으로 1.5배 확대 */
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.1s;
+}
+.battle-villain {
+  position: absolute;
+  bottom: 35%;
+  right: 15%; /* 5%에서 15%로 당김 */
+  z-index: 5;
+  image-rendering: pixelated;
+  height: clamp(130px, 28vh, 320px);
+  width: auto;
+  object-fit: contain;
+}
+.battle-villain.boss {
+  height: clamp(120px, 28vh, 360px);
+}
+
+/* 콤보 */
+.combo-display {
+  position: absolute;
+  bottom: 28%;
+  left: 5%;
+  z-index: 8;
+  font-family: var(--font-en);
+  font-size: clamp(14px, 2.5vw, 32px);
+  color: var(--c-gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.8);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.combo-display.show { opacity: 1; }
+
+/* HIT / MISS 이펙트 */
+.hit-effect {
+  position: absolute;
+  z-index: 20;
+  font-family: var(--font-en);
+  font-size: clamp(20px, 4vw, 56px);
+  font-weight: bold;
+  pointer-events: none;
+  opacity: 0;
+}
+.hit-effect.hit   { color: #FFD700; text-shadow: 0 0 20px #FFD700; }
+.hit-effect.miss  { color: #888;    text-shadow: 0 0 10px #888; }
+.hit-effect.crit  { color: #FF4444; text-shadow: 0 0 20px #FF4444; font-size: clamp(24px, 5vw, 70px); }
+.hit-effect.show  { animation: floatUp 1s ease forwards; }
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  50%  { opacity: 1; transform: translateY(-30px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-70px) scale(0.9); }
+}
+
+/* 화면 흔들림 */
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+}
+.shake { animation: shake 0.4s ease; }
+
+/* =====================================================
+   8. 퀴즈 모달
+===================================================== */
+.quiz-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 30;
+}
+.quiz-box {
+  background: rgba(10,10,30,0.97);
+  border: 2px solid var(--c-gold);
+  border-radius: 12px;
+  padding: 3% 4%;
+  width: min(700px, 85%);
+  max-height: 85%;
+  overflow-y: auto;
+  position: relative;
+}
+.quiz-progress {
+  font-family: var(--font-ko);
+  font-size: clamp(9px, 1.2vw, 14px);
+  color: var(--c-gray);
+  margin-bottom: 12px;
+}
+.quiz-question {
+  font-family: var(--font-ko);
+  font-size: clamp(12px, 1.8vw, 22px);
+  color: var(--c-white);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.quiz-options {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 16px;
+}
+.quiz-option {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.5vw, 18px);
+  color: var(--c-white);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.quiz-option:hover:not(:disabled) {
+  background: rgba(255,215,0,0.1);
+  border-color: var(--c-gold);
+}
+.quiz-option.correct  { background: rgba(39,174,96,0.3);  border-color: var(--c-green); color: #7fff7f; }
+.quiz-option.wrong    { background: rgba(231,76,60,0.3);  border-color: var(--c-red);   color: #ff9999; }
+.quiz-option:disabled { cursor: not-allowed; }
+
+/* OX 버튼 */
+.quiz-ox {
+  display: flex; gap: 4%; justify-content: center;
+  margin-bottom: 16px;
+}
+.quiz-ox-btn {
+  width: 25%; aspect-ratio: 1;
+  border: 3px solid;
+  border-radius: 50%;
+  font-family: var(--font-en);
+  font-size: clamp(24px, 5vw, 60px);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+}
+.quiz-ox-btn.o { border-color: var(--c-green); color: var(--c-green); }
+.quiz-ox-btn.x { border-color: var(--c-red);   color: var(--c-red); }
+.quiz-ox-btn:hover:not(:disabled) { transform: scale(1.1); }
+.quiz-ox-btn.correct { background: rgba(39,174,96,0.3); }
+.quiz-ox-btn.wrong   { background: rgba(231,76,60,0.3); }
+.quiz-ox-btn:disabled { cursor: not-allowed; }
+
+/* 힌트 버튼 */
+.quiz-hint-btn {
+  padding: 8px 16px;
+  background: rgba(74,111,227,0.2);
+  border: 1px solid var(--c-blue);
+  border-radius: 6px;
+  color: var(--c-blue);
+  font-family: var(--font-ko);
+  font-size: clamp(9px, 1.2vw, 14px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.quiz-hint-btn:hover { background: rgba(74,111,227,0.4); }
+
+/* 힌트 패널 */
+.hint-panel {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(74,111,227,0.4);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 12px;
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.3vw, 16px);
+  color: #aaaaff;
+  line-height: 1.6;
+  display: none;
+}
+.hint-panel.show { display: block; }
+.hint-panel iframe {
+  width: 315px; height: 560px;
+  max-width: 100%;
+  border: none;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+/* 해설 */
+.quiz-explanation {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(255,215,0,0.08);
+  border-left: 3px solid var(--c-gold);
+  font-family: var(--font-ko);
+  font-size: clamp(9px, 1.2vw, 14px);
+  color: var(--c-gray);
+  line-height: 1.6;
+  display: none;
+}
+.quiz-explanation.show { display: block; }
+
+/* =====================================================
+   9. 레벨 클리어 인터미션
+===================================================== */
+#screen-clear {
+  background: rgba(0,0,0,0.85);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3%;
+}
+#screen-clear.active { display: flex; }
+.clear-title {
+  font-family: var(--font-ko);
+  font-size: clamp(20px, 4vw, 52px);
+  color: var(--c-gold);
+  text-shadow: 0 0 30px rgba(255,215,0,0.8);
+  animation: clearPop 0.5s ease;
+}
+@keyframes clearPop {
+  0%{transform:scale(0.5);opacity:0} 60%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1}
+}
+.clear-stat {
+  font-family: var(--font-ko);
+  font-size: clamp(12px, 1.8vw, 22px);
+  color: var(--c-green);
+  animation: clearPop 0.5s ease 0.3s both;
+}
+.clear-villain-quote {
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.5vw, 18px);
+  color: var(--c-gray);
+  font-style: italic;
+  max-width: 60%;
+  text-align: center;
+  line-height: 1.7;
+}
+.btn-next-level {
+  padding: 1.5% 6%;
+  background: var(--c-gold);
+  color: var(--c-dark);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-ko);
+  font-size: clamp(12px, 1.8vw, 22px);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  margin-top: 2%;
+}
+.btn-next-level:hover { background: #FFA500; transform: scale(1.05); }
+
+/* =====================================================
+   10. 게임 오버 화면
+===================================================== */
+#screen-gameover {
+  background: rgba(0,0,0,0.9);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3%;
+}
+#screen-gameover.active { display: flex; }
+.gameover-title {
+  font-family: var(--font-en);
+  font-size: clamp(20px, 5vw, 60px);
+  color: var(--c-red);
+  text-shadow: 0 0 30px rgba(231,76,60,0.8);
+  animation: clearPop 0.5s ease;
+}
+.gameover-msg {
+  font-family: var(--font-ko);
+  font-size: clamp(12px, 1.8vw, 22px);
+  color: var(--c-white);
+  text-align: center;
+  line-height: 1.7;
+  max-width: 70%;
+}
+.gameover-btns { display: flex; gap: 3%; }
+.btn-retry {
+  padding: 1.2% 4%;
+  background: var(--c-orange);
+  color: var(--c-white);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.5vw, 18px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-retry:hover { background: #c47008; transform: scale(1.05); }
+.btn-restart {
+  padding: 1.2% 4%;
+  background: transparent;
+  color: var(--c-gray);
+  border: 1px solid var(--c-gray);
+  border-radius: 6px;
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.5vw, 18px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-restart:hover { color: var(--c-white); border-color: var(--c-white); }
+
+/* =====================================================
+   11. 엔딩 화면
+===================================================== */
+#screen-ending { cursor: pointer; }
+.ending-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.ending-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); }
+
+/* =====================================================
+   12. 보상 화면
+===================================================== */
+#screen-reward {
+  background: rgba(10,10,26,0.97);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3%;
+}
+#screen-reward.active { display: flex; }
+.badge-wrap { position: relative; }
+.master-badge {
+  width: min(600px, 80vw);
+  height: auto;
+  image-rendering: pixelated;
+}
+.badge-nickname {
+  position: absolute;
+  top: 28%;
+  left: 50%; transform: translateX(-50%);
+  font-family: var(--font-ko);
+  font-size: clamp(14px, 2.5vw, 30px);
+  color: var(--c-white);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  white-space: nowrap;
+}
+.reward-msg {
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.5vw, 18px);
+  color: var(--c-gold);
+  text-align: center;
+  line-height: 1.8;
+}
+.reward-coupon {
+  background: rgba(255,215,0,0.1);
+  border: 2px solid var(--c-gold);
+  border-radius: 8px;
+  padding: 2% 4%;
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.4vw, 16px);
+  color: var(--c-white);
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* =====================================================
+   공통 버튼 / 뮤트 / 팝업
+===================================================== */
+.mute-btn {
+  position: fixed;
+  bottom: 2%; right: 2%;
+  z-index: 100;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  width: clamp(32px, 4vw, 50px);
+  height: clamp(32px, 4vw, 50px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: clamp(14px, 2vw, 24px);
+  transition: all 0.2s;
+}
+.mute-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* 이탈 경고 팝업 */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center; justify-content: center;
+  z-index: 200;
+}
+.popup-overlay.show { display: flex; }
+.popup-box {
+  background: var(--c-navy);
+  border: 2px solid var(--c-gold);
+  border-radius: 12px;
+  padding: 5% 6%;
+  max-width: 400px;
+  width: 80%;
+  text-align: center;
+}
+.popup-title {
+  font-family: var(--font-ko);
+  font-size: clamp(13px, 2vw, 22px);
+  color: var(--c-gold);
+  margin-bottom: 12px;
+}
+.popup-msg {
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.4vw, 16px);
+  color: var(--c-white);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.popup-btns { display: flex; gap: 10px; justify-content: center; }
+.popup-btn-ok, .popup-btn-cancel {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.3vw, 16px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.popup-btn-ok { background: var(--c-red); color: var(--c-white); }
+.popup-btn-cancel { background: var(--c-gray); color: var(--c-white); }
+
+/* 로딩 */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: none; align-items: center; justify-content: center;
+  z-index: 300;
+  flex-direction: column; gap: 16px;
+}
+.loading-overlay.show { display: flex; }
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(255,215,0,0.2);
+  border-top-color: var(--c-gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: var(--font-ko);
+  font-size: clamp(11px, 1.5vw, 18px);
+  color: var(--c-gold);
+}
+/* 비주얼 노벨 대화창이 스탠딩 캐릭터보다 무조건 위에 오도록 수정 */
+.vn-dialog-wrap { z-index: 10; }
+
+/* 튜토리얼 및 카운트다운 UI 스타일 */
+.tutorial-overlay, .countdown-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.8);
+  display: none; align-items: center; justify-content: center; z-index: 50;
+}
+.tutorial-box {
+  background: rgba(10,10,26,0.95); border: 2px solid var(--c-gold); border-radius: 12px;
+  padding: 5% 6%; text-align: center; width: 80%; max-width: 500px;
+}
+.countdown-text {
+  font-family: var(--font-en); font-size: clamp(60px, 15vw, 120px);
+  color: var(--c-gold); text-shadow: 0 0 30px var(--c-orange);
+  animation: popIn 1s ease infinite;
+}
+@keyframes popIn { 
+  0% { transform: scale(0.5); opacity: 0; } 
+  50% { transform: scale(1.2); opacity: 1; } 
+  100% { transform: scale(1); opacity: 0; } 
+}
+/* =========================================
+   추가 패치: UI 비율 고정 및 줄바꿈 교정 (완성본)
+========================================= */
+
+/* ── 비주얼 노벨 스탠딩 캐릭터 위치 교정 ── */
+.vn-bg-char {
+  bottom: 28% !important; /* 대화창에 가려지지 않도록 훌쩍 위로 올림 */
+  height: 70% !important;
+}
+
+/* ── 대화창 정사이즈 고정 및 내부 레이아웃 ── */
+.vn-dialog-frame {
+  display: flex !important;
+  aspect-ratio: 1400 / 300 !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  box-sizing: border-box !important;
+}
+
+/* ── 텍스트 영역 (프레임 밖으로 삐져나감 방지 및 크기 확대) ── */
+.vn-text-area {
+  width: 75% !important; /* 전체 프레임의 75%까지만 사용 */
+  height: 100% !important;
+  padding: 5% 5% 5% 8% !important; /* 상, 우, 하, 좌 여백 (테두리 침범 방지) */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+.vn-speaker {
+  font-size: clamp(14px, 2vw, 24px) !important; /* 화자명 크기 확대 */
+  margin-bottom: 2% !important;
+}
+.vn-text {
+  font-size: clamp(16px, 2.5vw, 28px) !important; /* 대사 크기 시원하게 확대 */
+  line-height: 1.6 !important;
+  width: 100% !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+  white-space: pre-wrap !important;
+}
+
+/* ── 우측 초상화 영역 (크기 확대) ── */
+.vn-portrait {
+  width: 25% !important; /* 나머지 25% 공간 사용 */
+  height: 100% !important;
+  padding: 5% 8% 5% 2% !important; /* 우측 테두리에 닿지 않도록 여백 설정 */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+.vn-portrait img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  transform: scale(1.6) !important; /* 원본 이미지 자체의 투명 여백을 뚫고 1.6배 강제 확대 */
+  transform-origin: center center !important;
+}
+
+/* ── 버튼 및 팝업창 줄바꿈 교정 ── */
+.btn-spin, .btn-confirm, .btn-retry, .btn-restart {
+  white-space: nowrap !important;
+}
+.tutorial-box {
+  max-width: 600px !important;
+}
+.tutorial-box p {
+  word-break: keep-all !important;
+}
+/* 반응형 */
+@media (max-width: 640px) {
+  .char-desc { display: none; }
+  .vn-portrait { width: clamp(60px, 18vw, 100px); height: clamp(60px, 18vw, 100px); }
+}

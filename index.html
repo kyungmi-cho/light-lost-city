@@ -5,9 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>빛을 잃은 도시 : 전기도둑 토벌전</title>
+
+  <!-- 📱 폰트 사전 연결 + 직접 link 로딩 (CSS @import 보다 빠르게 발견·다운로드됨) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- 📱 세로 회전 안내 전용 스타일 (style.css 수정과 독립적으로 동작하도록 인라인 처리) -->
+  <style>
+    #rotate-notice { display: none; }
+    @media (orientation: portrait) and (max-width: 768px) {
+      #game-container { display: none !important; }
+      #rotate-notice {
+        display: flex !important;
+        position: fixed; inset: 0;
+        flex-direction: column; align-items: center; justify-content: center;
+        gap: 14px; padding: 24px; text-align: center;
+        background: #000; color: #FFD700; z-index: 9999;
+      }
+      #rotate-notice .rotate-icon { font-size: 56px; animation: rotateHint 1.6s ease-in-out infinite; }
+      #rotate-notice .rotate-text { font-size: 18px; }
+      #rotate-notice .rotate-sub { font-size: 13px; color: #888; }
+      @keyframes rotateHint {
+        0%, 100% { transform: rotate(0deg); }
+        50%      { transform: rotate(90deg); }
+      }
+    }
+  </style>
 </head>
 <body>
+
+<!-- 📱 세로 모드 회전 안내 (모바일 세로에서만 표시, CSS에서 제어) -->
+<div id="rotate-notice">
+  <div class="rotate-icon">📱↻</div>
+  <div class="rotate-text">가로 화면으로 돌려주세요</div>
+  <div class="rotate-sub">이 게임은 가로 화면에 최적화되어 있습니다.</div>
+</div>
 
 <!-- ── 게임 컨테이너 ── -->
 <div id="game-container">

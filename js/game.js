@@ -6,18 +6,16 @@ const Game = {
   isStarted: false, // 중복 클릭 방지용 안전장치
 
   // ── 초기화 ──
+  // ── 초기화 ──
   init() {
     this.setupEventListeners();
     this.showScreen('init');
     
     const initScreen = document.getElementById('screen-init');
     
-    // 💡 이벤트 중복 실행(오디오 겹침) 완벽 차단 핸들러
     const startHandler = (e) => {
-      // 모바일에서 touchstart가 발생하면 뒤따라오는 click을 무시하도록 처리
-      if (e && e.type === 'touchstart') {
-        e.preventDefault(); 
-      }
+      // 터치 이벤트 중복 차단
+      if (e && e.type === 'touchstart') e.preventDefault(); 
       
       if (this.isStarted) return; 
       this.isStarted = true;
@@ -29,18 +27,14 @@ const Game = {
         }
       } catch(err) {}
       
-      try {
-        const docEl = document.documentElement;
-        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(()=>{});
-        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
-      } catch(err) {}
+      // 🚨 문제의 원인이었던 전체화면(Fullscreen) 강제 요청 로직을 완전히 삭제했습니다.
+      // 이제 브라우저 기본 창 크기에 맞춰 자연스럽게 렌더링되며, 알럿 창이 떠도 화면이 깨지지 않습니다.
 
       this.showScreen('splash');
       this.runSplash();
     };
 
     if (initScreen) {
-      // 터치와 클릭을 모두 걸어두되, 터치가 작동하면 클릭은 방어되도록 설계
       initScreen.addEventListener('touchstart', startHandler, { passive: false });
       initScreen.addEventListener('click', startHandler);
     }

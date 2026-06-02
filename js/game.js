@@ -132,29 +132,31 @@ function sleep(ms) {
 
 // =====================================================
 // 📱 모바일 뷰포트 높이 보정 (--vh)
-// style.css 의 calc(var(--vh, 1vh) * 100) 에서 쓰는 실제 화면 높이 값.
-// iOS Safari / 구형 안드로이드는 주소창이 100vh 에 포함되어 하단 UI 가
-// 잘리거나 스크롤 시 레이아웃이 튀는데, window.innerHeight 기준으로
-// 실측해서 채워주면 그 문제가 사라진다.
 // =====================================================
 function setVH() {
-  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  // 💡 기본 innerHeight를 쓰되, visualViewport가 지원되면 그걸 최우선으로 씀 (iOS 툴바 완벽 무시)
+  let vh = window.innerHeight;
+  if (window.visualViewport) {
+    vh = window.visualViewport.height;
+  }
+  document.documentElement.style.setProperty('--vh', `${vh * 0.01}px`);
 }
 
-// 스크립트 로드 즉시 1회 적용 (첫 페인트 전에 최대한 반영)
 setVH();
-
-// 창 크기 변경 / 화면 회전 시 갱신
-//  - resize: 주소창이 접혔다 펴질 때도 발생
-//  - orientationchange: 회전 직후엔 innerHeight 가 갱신 전인 경우가 있어
-//    약간의 지연 후 다시 측정한다.
 window.addEventListener('resize', setVH);
 window.addEventListener('orientationchange', () => setTimeout(setVH, 200));
 
+// 💡 스크롤이나 툴바 축소/확대 시에도 즉각 대응
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', setVH);
+  window.visualViewport.addEventListener('scroll', setVH);
+}
+
 // =====================================================
-// 💡 이 부분이 빠져서 그동안 클릭이 안 되었던 것입니다! (게임 실행 코드)
+// 게임 실행 및 사전 준비
 // =====================================================
 window.onload = () => {
-  setVH(); // 로드 완료 후 최종 확정
+  setVH();
+  AudioManager.preloadSFX(); // 💡 사운드 딜레이 및 크롬 누락 방지를 위한 사전 로딩
   Game.init();
 };

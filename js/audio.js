@@ -1,18 +1,26 @@
 // =====================================================
-// AudioManager — BGM / SFX 관리 (사파리 완벽 대응)
+// AudioManager — BGM / SFX 관리 (사운드 누락 및 겹침 완벽 해결)
 // =====================================================
 
 const AudioManager = {
-  bgm: new Audio(), // 💡 전역으로 1개만 만들어 계속 재사용 (사파리 차단 우회)
-  sfxCache: {},
+  bgm: new Audio(),
+  sfxCache: {}, // 💡 SFX를 미리 담아둘 캐시 저장소
   bgmVolume: 0.5,
   sfxVolume: 0.8,
   muted: false,
 
-  // 💡 화면 첫 터치 시 무음으로 재생했다가 바로 멈춰서 브라우저에 오디오 권한 등록
+  // 💡 1. 사운드 사전 로드 (크롬 SFX 누락 방지)
+  preloadSFX() {
+    for (const key in CONFIG.SOUNDS.SFX) {
+      const src = CONFIG.SOUNDS.SFX[key];
+      const audio = new Audio(src);
+      audio.preload = 'auto'; // 미리 디코딩
+      this.sfxCache[src] = audio;
+    }
+  },
+
   initUnlock() {
     try {
-      // 소리 없는 0.1초짜리 투명 음원을 임시로 삽입하여 에러 원천 차단
       const silentWav = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
       
       this.bgm.src = silentWav;
@@ -56,11 +64,20 @@ const AudioManager = {
     }, 50);
   },
 
+  // 💡 2. SFX 재생 시 캐시된 객체를 cloneNode()로 복제하여 즉시 재생
   playSFX(src) {
     if (this.muted) return;
-    const audio = new Audio(src);
-    audio.volume = this.sfxVolume;
-    audio.play().catch(()=>{});
+    
+    let baseAudio = this.sfxCache[src];
+    if (!baseAudio) {
+      // 혹시 캐시에 없다면 새로 생성하여 캐시에 넣음
+      baseAudio = new Audio(src);
+      this.sfxCache[src] = baseAudio;
+    }
+    
+    const sound = baseAudio.cloneNode(); // 복제하여 동시 재생/겹침 완벽 대응
+    sound.volume = this.sfxVolume;
+    sound.play().catch(()=>{});
   },
 
   toggleMute() {

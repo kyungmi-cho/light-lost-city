@@ -44,14 +44,15 @@ html, body {
   -webkit-user-select: none;
 }
 
-/* ── 게임 컨테이너 (항상 16:9) ── */
+/* ── 게임 컨테이너 (항상 16:9 유지 + iOS 툴바 짤림 완벽 방지) ── */
 #game-container {
   position: fixed;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   width: 100vw; height: 56.25vw;
-  max-height: 100vh;
-  max-width: 177.78vh;
+  /* 💡 100vh 대신 JS에서 정교하게 계산한 --vh 적용 */
+  max-height: calc(var(--vh, 1vh) * 100);
+  max-width: calc(var(--vh, 1vh) * 177.78);
   overflow: hidden;
   background: var(--c-dark);
 }
@@ -1258,4 +1259,21 @@ html, body {
   .title-text { max-height: 35vh !important; object-fit: contain !important; }
   .master-badge { max-height: 30vh !important; object-fit: contain !important; }
   .battle-villain.boss { height: clamp(70px, 50vh, 150px) !important; bottom: 8% !important; }
+}
+/* =====================================================
+   🔥 최후의 모달 UI 짤림 방지 및 스크롤 허용 
+===================================================== */
+.quiz-box, 
+.tutorial-box, 
+.login-box, 
+.popup-box, 
+.char-select-wrap {
+  /* 💡 화면(실제 뷰포트)의 85% 크기까지만 커질 수 있음 */
+  max-height: calc(var(--vh, 1vh) * 85) !important;
+  
+  /* 💡 내용이 길어서 잘릴 것 같으면 내부 스크롤 생성 */
+  overflow-y: auto !important;
+  
+  /* 💡 iOS에서 부드러운 터치 스크롤링 활성화 */
+  -webkit-overflow-scrolling: touch !important; 
 }

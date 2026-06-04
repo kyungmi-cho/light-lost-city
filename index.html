@@ -49,7 +49,7 @@
 <div id="game-container">
   <div id="screen-init" class="screen active" style="display:flex; flex-direction: column; align-items:center; justify-content:center; background:#000; z-index:999; cursor:pointer;">
     <div style="color:var(--c-gold); font-size:clamp(14px, 2.5vw, 32px); animation:blink 1s infinite; margin-bottom: 20px;">화면을 터치해서 게임을 시작하세요</div>
-    <div style="color:var(--c-gray); font-size:clamp(10px, 1.5vw, 16px); text-align: center;">모바일은 가로 화면에 최적화 되어 있습니다.</div>
+    <div style="color:var(--c-gray); font-size:clamp(10px, 1.5vw, 16px); text-align: center;">이 게임은 PC에 최적화 되어 있습니다</div>
   </div>
 
   <!-- ══════════════════════════════════
@@ -91,7 +91,7 @@
       <div class="char-card" data-char="firefly">
         <img src="images/dialogs/dialog_firefly.png" alt="반딧불이">
         <div class="char-name">반짝이 반딧불이</div>
-        <div class="char-desc">어둠 속에서도 빛을 잃지 않는 전사!<br>바이오 루미네선스 빔</div>
+        <div class="char-desc">어둠 속에서도 빛을 잃지 않는 전사!<br>루미네선스 빔</div>
       </div>
 
     </div>
@@ -117,15 +117,15 @@
   ══════════════════════════════════ -->
   <div id="screen-login" class="screen">
     <div class="login-box">
-      <div class="login-title">⚡ 제일전기 기술학원<br>ID를 입력해주세요</div>
+      <div class="login-title">⚡제일전기 기술학원<br>ID를 입력해주세요</div>
       <input class="login-input" id="input-user-id" type="text" placeholder="학원 ID를 입력하세요" autocomplete="off">
       <label class="marketing-row">
         <input type="checkbox" id="check-marketing">
         마케팅 수신에 동의합니다
         <span class="marketing-badge">❤️ 생명 +1</span>
       </label>
-      <button class="btn-start-journey" id="btn-start-journey">⚡ 여정 시작!</button>
-      <button class="btn-guest" id="btn-guest">Guest로 진행하기 (혜택 미제공)</button>
+      <button class="btn-start-journey" id="btn-start-journey">⚡게임 시작⚡</button>
+      <button class="btn-guest" id="btn-guest">Guest로 진행하기(혜택 미제공)</button>
     </div>
   </div>
 
@@ -225,11 +225,11 @@
     </div>
     <div class="tutorial-overlay" id="tutorial-overlay">
       <div class="tutorial-box">
-        <h3 style="color:var(--c-gold); margin-bottom:15px; font-size:clamp(14px, 2vw, 24px);">⚡ 전투 방법 안내</h3>
+        <h3 style="color:var(--c-gold); margin-bottom:15px; font-size:clamp(14px, 2vw, 24px);">⚡전투 방법 안내⚡</h3>
         <p style="line-height:1.8; font-size:clamp(11px, 1.6vw, 17px); margin-bottom:20px; color:var(--c-white); word-break:keep-all;">
           제한 시간(120초) 안에 퀴즈 정답을 맞혀 적을 공격하세요!<br>
-          <span style="color:var(--c-gold)">3연속 정답부터</span> 공격력이 눈덩이처럼 불어나는 <span style="color:var(--c-gold)">콤보 효과</span>가 발동됩니다.<br>
-          <span style="color:var(--c-red)">오답 시</span> 내 공격이 빗나가고, 적에게 <span style="color:var(--c-red)">매서운 반격</span>을 당하니 주의하세요!
+          <span style="color:var(--c-gold)">3연속 정답부터</span> 공격력이 증가하는 <span style="color:var(--c-gold)">콤보 효과</span>가 발동됩니다.<br>
+          <span style="color:var(--c-red)">오답 시</span> 공격이 빗나가고, 적은 3번에 한 번<span style="color:var(--c-red)">크리티컬</span>공격을 합니다!
         </p>
         <button class="btn-start-journey" id="btn-close-tutorial">전투 시작!</button>
       </div>

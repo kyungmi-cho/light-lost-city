@@ -102,7 +102,7 @@ const Screens = {
     });
 
     guestBtn.addEventListener('click', () => {
-      if (!confirm('ID 없이 진행하면 할인 쿠폰 및 이벤트 혜택을 받을 수 없습니다.\n그래도 Guest로 진행하시겠습니까?')) return;
+      if (!confirm('Guest로 진행하면 할인쿠폰 및 이벤트 혜택을 받을 수 없습니다.\n그래도 진행하시겠습니까?')) return;
       AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK);
       GameState.isGuest = true;
       GameState.userId = 'Guest';
@@ -135,8 +135,8 @@ const Screens = {
     const lv = CONFIG.LEVELS[level];
     const quotes = {
       1: '윙... 고작 기초 상식에서 막힐 줄은... 다음엔 더 센 친구가 기다릴 거야!',
-      2: '......인정합니다. 전기 이론에서 제가 졌군요. 다음은 더 복잡할 거예요...',
-      3: '으아아... 회로이론까지 꿰고 있다고?! 위에 보스는 차원이 달라!',
+      2: '......인정합니다. 당신의 전기 상식 훌륭하군요. 하지만 다음은 더 복잡할 거예요...',
+      3: '으아아... 내가 이렇게 졌다고?! 하지만 보스는 차원이 달라!',
     };
     const stats = {
       1: '⚡ 공격력 +5 상승!',

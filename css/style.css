@@ -1417,12 +1417,11 @@ html, body, .vn-text-area, .vn-text, .vn-speaker {
   width: 100% !important; 
 }
 /* =====================================================
-   PC 폰트 사이즈 복구 (min-width: 641px)
-   - 하단 전역 .vn-text / .vn-speaker 규칙이 PC에서도
-     max 16px / 14px로 덮어씌우는 것을 수정
-   - 모바일(≤640px) 에는 영향 없음
+   PC 폰트 사이즈 복구
+   hover:hover + pointer:fine = 마우스/트랙패드 기기 (PC/Mac)
+   터치 기기(아이폰, 아이패드, 안드로이드)는 절대 매칭 안 됨
 ===================================================== */
-@media (min-width: 641px) {
+@media (hover: hover) and (pointer: fine) {
   .vn-text {
     font-size: clamp(16px, 2.5vw, 28px) !important;
     line-height: 1.6 !important;
@@ -1430,10 +1429,5 @@ html, body, .vn-text-area, .vn-text, .vn-speaker {
   .vn-speaker {
     font-size: clamp(14px, 2vw, 24px) !important;
     margin-bottom: 2% !important;
-  }
-  * {
-    -webkit-text-size-adjust: 100% !important;
-    -moz-text-size-adjust: 100% !important;
-    text-size-adjust: 100% !important;
   }
 }

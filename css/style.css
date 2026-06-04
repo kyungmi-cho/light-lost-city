@@ -1302,3 +1302,39 @@ html, body {
     word-break: keep-all !important; /* 단어가 중간에 잘려서 줄바꿈되는 현상 방지 */
   }
 }
+/* ============================================================
+   📱 UI 폴리시 — 한글 줄바꿈 / 간격 / 화자 이름 잘림 보정
+   ⚠️ 이 블록을 style.css "맨 끝"에 그대로 추가하세요.
+      (맨 끝에 와야 기존 규칙을 덮어써서 정확히 적용됩니다)
+   ============================================================ */
+
+/* 1) 한글이 어절 중간에서 끊기지 않게 (예: "전사!" 가 "전 / 사!" 로 갈리는 현상 방지) */
+.char-name,
+.char-desc,
+.roulette-name,
+.login-title,
+.popup-title,
+.popup-msg,
+.reward-msg,
+.reward-coupon,
+.clear-villain-quote,
+.gameover-msg,
+.quiz-question,
+.quiz-option,
+.hp-name {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* 2) 동료 선택 — 카드 높이를 같게 맞추고, 카드와 확정 버튼 사이 거리감 확보 */
+.char-cards { align-items: stretch; }
+.char-desc { margin-top: 6px; }
+.char-select-btn { margin-top: 4%; }
+
+/* 3) 비주얼노벨 — 화자 이름 첫 글자가 프레임 장식에 가려 잘리는 문제
+      (가로 화면=낮은 높이일 때 왼쪽 여백이 5%로 줄어드는 규칙까지 덮어씀) */
+.vn-text-area { padding-left: 11% !important; }
+
+/* 4) 튜토리얼 안내 — 줄 간격이 너무 떠 보이는 현상 살짝 정리 */
+.tutorial-box p  { line-height: 1.65 !important; }
+.tutorial-box h3 { margin-bottom: 12px !important; }

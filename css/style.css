@@ -1354,3 +1354,34 @@ html, body {
   overflow-y: auto !important;
   min-height: 0 !important;
 }
+/* =====================================================
+   🚨 사파리 가로모드 폰트 뻥튀기 & 대화창 넘침 원천 차단
+===================================================== */
+
+/* 1. 사파리 폰트 강제 확대 완전 무효화 (전체 요소 적용) */
+* {
+  -webkit-text-size-adjust: none !important;
+  -moz-text-size-adjust: none !important;
+  text-size-adjust: none !important;
+}
+
+/* 2. 대화창 프레임 밖으로 나가는 현상 방지 */
+.vn-dialog-frame {
+  max-width: 100% !important;
+  overflow: hidden !important; 
+}
+
+/* 3. 사파리 Flexbox 텍스트 넘침 방지 치트키 */
+.vn-text-area {
+  flex: 1 1 auto !important; 
+  min-width: 0 !important; /* 사파리가 내부 텍스트 너비를 잘못 계산하는 버그 해결 */
+  padding-right: 5% !important; /* 우측 초상화와 텍스트가 겹치지 않도록 안전 여백 추가 */
+}
+
+/* 4. 텍스트 자체의 크기 계산 보정 */
+.vn-text {
+  width: 100% !important;
+  max-height: 100% !important;
+  word-break: keep-all !important;
+  overflow-wrap: break-word !important;
+}

@@ -1356,15 +1356,15 @@ html, body {
   overflow-y: auto !important;
   min-height: 0 !important;
 }
-/* =====================================================
-   🚨 사파리 가로모드 폰트 뻥튀기 & 대화창 넘침 원천 차단
-===================================================== */
+/* ============================================================
+   🚨 사파리 가로모드 폰트 뻥튀기 & 대화창 넘침 원천 차단 (수치 교정)
+============================================================ */
 
-/* 1. 사파리 폰트 강제 확대 방지 (none은 최신 iOS에서 무시되므로 100%로 변경 필수) */
+/* 1. 사파리 폰트 강제 확대 완전 무효화 */
 * {
-  -webkit-text-size-adjust: 100% !important;
-  -moz-text-size-adjust: 100% !important;
-  text-size-adjust: 100% !important;
+  -webkit-text-size-adjust: none !important;
+  -moz-text-size-adjust: none !important;
+  text-size-adjust: none !important;
 }
 
 /* 2. 대화창 프레임 밖으로 나가는 현상 방지 */
@@ -1380,17 +1380,20 @@ html, body {
   padding-right: 5% !important; 
 }
 
-/* 4. 텍스트 자체의 크기 계산 보정 + vw 단위 버그 원천 차단 */
+/* 4. 텍스트 크기 완벽 복구 (제가 엄청 크게 줬던 5vh → 원래 비율인 3vh 대역으로 축소) */
 .vn-text {
   width: 100% !important;
   max-height: 100% !important;
   word-break: keep-all !important;
   overflow-wrap: break-word !important;
-  /* 👇 폰트 뻥튀기의 주범인 vw를 버리고 vh를 사용하여 사파리 계산 버그 차단 */
-  font-size: clamp(14px, 5vh, 22px) !important;
+  
+  /* 👇 14px~22px로 잘못 드렸던 5vh를 원래의 아담한 사이즈로 정상화 */
+  font-size: clamp(11px, 3.5vh, 16px) !important;
+  line-height: 1.5 !important;
 }
 
-/* 화자 이름 크기도 안전한 vh 단위로 강제 고정 */
 .vn-speaker {
-  font-size: clamp(12px, 4vh, 18px) !important;
+  /* 👇 화자 이름도 대사보다 살짝 작고 정갈하게 복구 */
+  font-size: clamp(10px, 3vh, 14px) !important;
+  margin-bottom: 4px !important;
 }

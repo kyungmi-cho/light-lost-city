@@ -1416,3 +1416,24 @@ html, body, .vn-text-area, .vn-text, .vn-speaker {
   display: block !important;
   width: 100% !important; 
 }
+/* =====================================================
+   PC 폰트 사이즈 복구 (min-width: 641px)
+   - 하단 전역 .vn-text / .vn-speaker 규칙이 PC에서도
+     max 16px / 14px로 덮어씌우는 것을 수정
+   - 모바일(≤640px) 에는 영향 없음
+===================================================== */
+@media (min-width: 641px) {
+  .vn-text {
+    font-size: clamp(16px, 2.5vw, 28px) !important;
+    line-height: 1.6 !important;
+  }
+  .vn-speaker {
+    font-size: clamp(14px, 2vw, 24px) !important;
+    margin-bottom: 2% !important;
+  }
+  * {
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+}

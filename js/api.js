@@ -1,33 +1,25 @@
 // =====================================================
-// api.js — GAS 통신 모듈 (콜드스타트 지연 및 재시도 대응 완벽 적용)
+// api.js — GAS 통신 모듈 (단일 요청, 30초 대기)
 // =====================================================
 
 const API = {
-  // ── 1. 퀴즈 데이터 가져오기 (JSONP) ──
-  // 💡 GAS 콜드스타트 지연을 고려해 retries(재시도) 파라미터 추가
-  fetchQuiz(level, retries = 1) { 
+  fetchQuiz(level) {
     return new Promise((resolve, reject) => {
-      const cbName = 'cb_' + Date.now();
+      // 💡 콜백 이름 중복 방지를 위해 랜덤 난수 추가
+      const cbName = 'cb_quiz_' + Date.now() + Math.floor(Math.random() * 1000);
       const script = document.createElement('script');
       
-      // 💡 타임아웃을 10초(10000)에서 20초(20000)로 증가
+      // 💡 GAS가 깨어날 수 있도록 넉넉히 30초 부여
       const timeout = setTimeout(() => {
         delete window[cbName];
-        if (document.body.contains(script)) document.body.removeChild(script);
-        
-        // 타임아웃 발생 시 재시도 로직 발동
-        if (retries > 0) {
-          console.warn(`퀴즈 로딩 지연, ${retries}회 재시도합니다...`);
-          resolve(this.fetchQuiz(level, retries - 1));
-        } else {
-          reject(new Error('Quiz fetch timeout'));
-        }
-      }, 20000); 
+        if (document.body.contains(script)) script.remove();
+        reject(new Error('서버 응답 지연 (다시 시도해주세요)'));
+      }, 30000); 
 
       window[cbName] = (data) => {
         clearTimeout(timeout);
         delete window[cbName];
-        if (document.body.contains(script)) document.body.removeChild(script);
+        if (document.body.contains(script)) script.remove();
         if (data.success) resolve(data);
         else reject(new Error(data.error || 'Quiz fetch failed'));
       };
@@ -36,17 +28,15 @@ const API = {
       
       script.onerror = () => { 
         clearTimeout(timeout); 
-        if (document.body.contains(script)) document.body.removeChild(script);
-        if (retries > 0) resolve(this.fetchQuiz(level, retries - 1));
-        else reject(new Error('Script load error')); 
+        if (document.body.contains(script)) script.remove();
+        reject(new Error('네트워크 오류')); 
       };
       
       document.body.appendChild(script);
     });
   },
 
-  // ── 2. 참여자 로그 저장 및 쿠폰 발급 요청 (JSONP) ──
-  saveLog(data, retries = 1) {
+  saveLog(data) {
     return new Promise((resolve, reject) => {
       if (data.userId === 'Guest') {
         fetch(CONFIG.API_URL, { 
@@ -58,22 +48,19 @@ const API = {
         return;
       }
 
-      const cbName = 'cb_log_' + Date.now();
+      const cbName = 'cb_log_' + Date.now() + Math.floor(Math.random() * 1000);
       const script = document.createElement('script');
       
-      // 💡 저장/쿠폰 발급도 동일하게 20초 대기
       const timeout = setTimeout(() => {
         delete window[cbName];
-        if (document.body.contains(script)) document.body.removeChild(script);
-        
-        if (retries > 0) resolve(this.saveLog(data, retries - 1));
-        else reject(new Error('Log/Coupon network timeout'));
-      }, 20000);
+        if (document.body.contains(script)) script.remove();
+        reject(new Error('서버 응답 지연'));
+      }, 30000);
 
       window[cbName] = (res) => {
         clearTimeout(timeout);
         delete window[cbName];
-        if (document.body.contains(script)) document.body.removeChild(script);
+        if (document.body.contains(script)) script.remove();
         if (res.success) resolve(res);
         else reject(new Error(res.error || '발급 오류'));
       };
@@ -93,9 +80,8 @@ const API = {
       script.src = `${CONFIG.API_URL}?${params.toString()}`;
       script.onerror = () => { 
         clearTimeout(timeout); 
-        if (document.body.contains(script)) document.body.removeChild(script);
-        if (retries > 0) resolve(this.saveLog(data, retries - 1));
-        else reject(new Error('Script connection error')); 
+        if (document.body.contains(script)) script.remove();
+        reject(new Error('네트워크 오류')); 
       };
       
       document.body.appendChild(script);

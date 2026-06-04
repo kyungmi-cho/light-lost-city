@@ -97,7 +97,13 @@ const VisualNovel = {
     Game.showScreen('visual-novel');
     this.renderScene();
     document.getElementById('screen-visual-novel').onclick = () => this.next();
-    document.getElementById('vn-skip-btn').onclick = () => { this.onComplete && this.onComplete(); };
+    document.getElementById('vn-skip-btn').onclick = () => {
+  if (this.typeTimer) clearInterval(this.typeTimer);  // 타이핑 강제 중단
+  this.isTyping = false;
+  document.getElementById('screen-visual-novel').onclick = null;  // 화면 클릭 제거
+  document.getElementById('vn-skip-btn').onclick = null;          // 스킵 중복 방지
+  this.onComplete && this.onComplete();
+};
   },
 
   playOpening(onComplete) { this.play(this.OPENING_SCENES, onComplete, 'images/backgrounds/bg_opening.png'); },
@@ -107,10 +113,12 @@ const VisualNovel = {
 
   // ── 현재 씬 렌더링 ──
   renderScene() {
-    if (this.currentIdx >= this.scenes.length) {
-      this.onComplete && this.onComplete();
-      return;
-    }
+  if (this.currentIdx >= this.scenes.length) {
+    document.getElementById('screen-visual-novel').onclick = null; // ← 추가
+    document.getElementById('vn-skip-btn').onclick = null;         // ← 추가
+    this.onComplete && this.onComplete();
+    return;
+  }
     const scene = this.scenes[this.currentIdx];
     AudioManager.playSFX(CONFIG.SOUNDS.SFX.BUBBLE);
 

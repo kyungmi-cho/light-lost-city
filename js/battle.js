@@ -339,7 +339,11 @@ const Battle = {
     GameState.villain.hp = Math.max(0, GameState.villain.hp - atk);
     this.updateHPBars();
 
+    document.getElementById('screen-battle').classList.add('shake');
+
     await sleep(600);
+    document.getElementById('screen-battle').classList.remove('shake');
+
 
     // 원상복구
     playerImg.src = CONFIG.IMAGES.PLAYER[GameState.character].idle;

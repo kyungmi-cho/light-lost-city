@@ -1350,16 +1350,3 @@ html, body {
   overflow-y: auto !important;
   min-height: 0 !important;
 }
-
-/* (B) 화자 이름만 살짝 들여써서 프레임 좌상단 장식 침범 방지 (본문 폭은 그대로) */
-.vn-speaker { padding-left: 5% !important; }
-
-/* (C) 큰 화면(높이>600·폭>640)에서만: 큰 폰트가 납작한 프레임을 넘기던 문제 →
-       대사·화자명 최대 크기를 프레임 높이에 맞게 축소 (작은 화면 규칙은 그대로) */
-@media (min-width: 641px) and (min-height: 601px) {
-  .vn-speaker { font-size: clamp(13px, 1.5vw, 18px) !important; }
-  .vn-text {
-    font-size: clamp(13px, 1.6vw, 18px) !important;
-    line-height: 1.45 !important;
-  }
-}

@@ -1,38 +1,55 @@
 // =====================================================
-// AudioManager — BGM / SFX 관리 (사운드 누락 및 겹침 완벽 해결)
+// AudioManager — Web Audio API 적용 (모바일 SFX 재생 보장)
 // =====================================================
 
 const AudioManager = {
   bgm: new Audio(),
-  sfxCache: {}, // 💡 SFX를 미리 담아둘 캐시 저장소
+  sfxCache: {}, 
   bgmVolume: 0.5,
   sfxVolume: 0.8,
   muted: false,
+  audioCtx: null, // 💡 Web Audio API 컨텍스트 추가
 
-  // 💡 1. 사운드 사전 로드 (크롬 SFX 누락 방지)
+  // 💡 1. 사운드 사전 로드 (Web Audio API로 디코딩하여 메모리에 저장)
   preloadSFX() {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) {
+      this.audioCtx = new AudioContext();
+    }
+
     for (const key in CONFIG.SOUNDS.SFX) {
       const src = CONFIG.SOUNDS.SFX[key];
-      const audio = new Audio(src);
-      audio.preload = 'auto'; // 미리 디코딩
-      this.sfxCache[src] = audio;
+      
+      if (this.audioCtx) {
+        // Web Audio API 방식 (모바일 권장)
+        fetch(src)
+          .then(res => res.arrayBuffer())
+          .then(buffer => this.audioCtx.decodeAudioData(buffer))
+          .then(decoded => { this.sfxCache[src] = decoded; })
+          .catch(e => console.warn('SFX fetch error', e));
+      } else {
+        // 구형 브라우저 대비 Fallback
+        const audio = new Audio(src);
+        audio.preload = 'auto';
+        this.sfxCache[src] = audio;
+      }
     }
   },
 
+  // 💡 2. 터치 발생 시 오디오 락 해제 (Context Resume)
   initUnlock() {
     try {
+      // Web Audio API 잠금 해제
+      if (this.audioCtx && this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+
+      // BGM용 HTML5 Audio 잠금 해제
       const silentWav = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-      
       this.bgm.src = silentWav;
       const playPromise = this.bgm.play();
       if (playPromise !== undefined) {
         playPromise.then(() => { this.bgm.pause(); }).catch(()=>{});
-      }
-      
-      const tempSfx = new Audio(silentWav);
-      const sfxPromise = tempSfx.play();
-      if (sfxPromise !== undefined) {
-        sfxPromise.then(() => { tempSfx.pause(); }).catch(()=>{});
       }
     } catch(e) {
       console.warn("오디오 락 해제 중단 (무시됨)");
@@ -64,20 +81,33 @@ const AudioManager = {
     }, 50);
   },
 
-  // 💡 2. SFX 재생 시 캐시된 객체를 cloneNode()로 복제하여 즉시 재생
+  // 💡 3. SFX 재생 (BufferSource 사용으로 모바일 정책 우회 및 지연율 0%)
   playSFX(src) {
     if (this.muted) return;
     
-    let baseAudio = this.sfxCache[src];
-    if (!baseAudio) {
-      // 혹시 캐시에 없다면 새로 생성하여 캐시에 넣음
-      baseAudio = new Audio(src);
-      this.sfxCache[src] = baseAudio;
+    // Web Audio API를 지원하고 캐시된 버퍼가 있는 경우
+    if (this.audioCtx && this.sfxCache[src] instanceof AudioBuffer) {
+      const source = this.audioCtx.createBufferSource();
+      source.buffer = this.sfxCache[src];
+      
+      const gainNode = this.audioCtx.createGain();
+      gainNode.gain.value = this.sfxVolume;
+      
+      source.connect(gainNode);
+      gainNode.connect(this.audioCtx.destination);
+      source.start(0);
+    } 
+    // Fallback: HTML5 Audio 방식
+    else {
+      let baseAudio = this.sfxCache[src];
+      if (!baseAudio || baseAudio instanceof AudioBuffer) {
+        baseAudio = new Audio(src);
+        this.sfxCache[src] = baseAudio;
+      }
+      const sound = baseAudio.cloneNode();
+      sound.volume = this.sfxVolume;
+      sound.play().catch(()=>{});
     }
-    
-    const sound = baseAudio.cloneNode(); // 복제하여 동시 재생/겹침 완벽 대응
-    sound.volume = this.sfxVolume;
-    sound.play().catch(()=>{});
   },
 
   toggleMute() {

@@ -1397,3 +1397,22 @@ html, body {
   font-size: clamp(10px, 3vh, 14px) !important;
   margin-bottom: 4px !important;
 }
+/* =====================================================
+   🚨 사파리 가로모드 폰트 뻥튀기(Font Boosting) 전용 방어 코드
+===================================================== */
+
+/* 1. 전체 영역 폰트 사이즈 자동 조절 방지 */
+html, body, .vn-text-area, .vn-text, .vn-speaker {
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+/* 2. 사파리 폰트 확대 강제 비활성화 핵(Hack) */
+.vn-text, .vn-speaker {
+  /* 사파리가 텍스트 영역의 한계를 인식하도록 유도하여 폰트 확대를 끔 */
+  max-height: 999999px !important; 
+  
+  /* Flexbox 내부에서 텍스트 블록의 넓이 계산 버그 방지 */
+  display: block !important;
+  width: 100% !important; 
+}

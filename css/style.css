@@ -471,7 +471,11 @@ html, body {
   animation: blink 0.8s step-end infinite;
   z-index: 3;
 }
+/* style.css — .vn-skip-btn 바로 위에 추가 */
+.vn-dialog-wrap { pointer-events: none; }
+
 .vn-skip-btn {
+  pointer-events: auto; /* ← 이 줄을 기존 블록 안에 추가 */
   position: absolute;
   top: 2%; right: 2%;
   background: rgba(0,0,0,0.5);
@@ -1458,11 +1462,15 @@ html, body, .vn-text-area, .vn-text, .vn-speaker-badge {
   text-size-adjust: 100% !important;
 }
 
-/* 2. 사파리 폰트 확대 강제 비활성화 핵(Hack) */
-.vn-text, .vn-speaker-badge {
+/* 수정 — .vn-speaker-badge 분리 */
+.vn-text {
   max-height: 999999px !important; 
   display: block !important;
   width: 100% !important; 
+}
+.vn-speaker-badge {
+  max-height: 999999px !important;
+  /* display/width 는 inline-block 유지 */
 }
 /* =====================================================
    PC 폰트 사이즈 복구

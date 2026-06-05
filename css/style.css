@@ -380,7 +380,6 @@ html, body {
     inset 0 0 0 1px rgba(255,215,0,0.1);
   border-radius: 2px;
   min-height: 14vh;
-  overflow: hidden;
 }
 
 /* 모서리 삼각 장식 */
@@ -472,8 +471,6 @@ html, body {
   z-index: 3;
 }
 /* style.css — .vn-skip-btn 바로 위에 추가 */
-.vn-dialog-wrap { pointer-events: none; }
-
 .vn-skip-btn {
   pointer-events: auto; /* ← 이 줄을 기존 블록 안에 추가 */
   position: absolute;

@@ -187,9 +187,12 @@ next() {
     const textEl = document.getElementById('vn-text');
     const scrollArea = textEl.closest('.vn-text-area');
     textEl.textContent = scene.text.replace(/\[NICKNAME\]/g, GameState.nickname);
-    if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight; // ← 전체 출력 후 최하단
+    if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
     this.isTyping = false;
     return;
   }
+  // 타이핑 중 아닐 때 → 다음 씬으로
+  this.currentIdx++;
+  this.renderScene();
 }
 }

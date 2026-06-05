@@ -345,26 +345,79 @@ html, body {
   bottom: 3%;
   left: 50%; transform: translateX(-50%);
   width: 92%;
-  display: flex; flex-direction: column; gap: 0;
 }
+
+/* 화자 이름 뱃지 — 프레임 상단에 겹쳐 표시 */
+.vn-speaker-badge {
+  display: inline-block;
+  margin-left: 1.5%;
+  margin-bottom: -1px;
+  padding: 0.3em 1.2em;
+  font-family: var(--font-ko);
+  font-size: clamp(10px, 1.4vw, 16px);
+  color: var(--c-gold);
+  background: var(--c-dark);
+  border: 2px solid var(--c-gold);
+  border-bottom: none;
+  box-shadow: 0 0 0 1px var(--c-dark), 0 0 0 3px #7a5f00;
+  border-radius: 2px 2px 0 0;
+  position: relative; z-index: 2;
+  white-space: nowrap;
+  min-width: 4em;
+}
+
+/* 메인 프레임 — CSS 이중 골드 테두리 */
 .vn-dialog-frame {
   position: relative;
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  background: rgba(0,0,0,0.0);
+  display: flex;
+  align-items: stretch;
+  background: rgba(8, 8, 20, 0.95);
+  border: 3px solid var(--c-gold);
+  box-shadow:
+    0 0 0 1px var(--c-dark),
+    0 0 0 4px #7a5f00,
+    inset 0 0 0 1px rgba(255,215,0,0.1);
+  border-radius: 2px;
+  min-height: 14vh;
+  overflow: hidden;
 }
-.vn-frame-bg {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  /* object-fit: fill; 삭제 완료 */
-  image-rendering: pixelated; 
+
+/* 모서리 삼각 장식 */
+.vn-corner {
+  position: absolute;
+  width: clamp(10px, 1.5vw, 16px);
+  height: clamp(10px, 1.5vw, 16px);
+  z-index: 3;
+  pointer-events: none;
 }
+.vn-corner svg { width: 100%; height: 100%; display: block; }
+.vn-corner.tl { top: -1px; left: -1px; }
+.vn-corner.tr { top: -1px; right: -1px; transform: scaleX(-1); }
+.vn-corner.bl { bottom: -1px; left: -1px; transform: scaleY(-1); }
+.vn-corner.br { bottom: -1px; right: -1px; transform: scale(-1, -1); }
+
+/* 텍스트 영역 — 고정 높이 + 내부 스크롤, 최하단 자동 추적 */
 .vn-text-area {
+  flex: 1;
+  min-width: 0;
   position: relative; z-index: 2;
-  padding: 4.5% 8% 5% 10%; /* 패딩 수정 완료 */
-  min-height: 12vh;
-  display: flex; flex-direction: column; justify-content: center;
+  padding: 3.5% 3% 3.5% 4%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  display: flex;
+  align-items: flex-start;
+}
+.vn-text-area::-webkit-scrollbar { display: none; }
+
+/* 세로 구분선 */
+.vn-divider {
+  width: 2px;
+  flex-shrink: 0;
+  margin: 4% 0;
+  background: linear-gradient(to bottom, transparent, var(--c-gold) 20%, var(--c-gold) 80%, transparent);
 }
 
 /* 👇 배경 스탠딩 캐릭터용으로 새로 추가 */
@@ -381,24 +434,29 @@ html, body {
   image-rendering: pixelated;
 }
 .vn-speaker {
-  font-family: var(--font-ko);
-  font-size: clamp(10px, 1.4vw, 16px);
-  color: var(--c-gold);
-  margin-bottom: 6px;
+  /* vn-speaker-badge 로 이전됨. 하위 호환용 빈 규칙 */
 }
 .vn-text {
   font-family: var(--font-ko);
-  font-size: clamp(11px, 1.6vw, 18px);
+  font-size: clamp(14px, 1.6vw, 20px);
   color: var(--c-white);
-  line-height: 1.7;
+  line-height: 1.8;
   white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  width: 100%;
 }
+
+/* 포트레이트 — 정방형 (이미지 비율 자동 유지) */
 .vn-portrait {
   position: relative; z-index: 2;
-  width: clamp(80px, 12vw, 160px);
-  height: clamp(80px, 12vw, 160px);
-  padding: 5% 6% 6% 2%;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  height: 100%;
   display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.3);
+  padding: 4%;
+  box-sizing: border-box;
 }
 .vn-portrait img {
   width: 100%; height: 100%;
@@ -991,31 +1049,24 @@ html, body {
   height: 70% !important;
 }
 
-/* ── 대화창 정사이즈 고정 및 내부 레이아웃 ── */
-.vn-dialog-frame {
-  display: flex !important;
-  aspect-ratio: 1400 / 300 !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  box-sizing: border-box !important;
-}
-
-/* ── 텍스트 영역 (프레임 밖으로 삐져나감 방지 및 크기 확대) ── */
+/* ── 대화창 텍스트 영역 (CSS 프레임 기준) ── */
 .vn-text-area {
-  width: 75% !important; /* 전체 프레임의 75%까지만 사용 */
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
   height: 100% !important;
-  padding: 5% 5% 5% 8% !important; /* 상, 우, 하, 좌 여백 (테두리 침범 방지) */
+  padding: 4% 3% 4% 4% !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   box-sizing: border-box !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
 }
-.vn-speaker {
-  font-size: clamp(14px, 2vw, 24px) !important; /* 화자명 크기 확대 */
-  margin-bottom: 2% !important;
+.vn-speaker-badge {
+  font-size: clamp(14px, 2vw, 24px) !important;
 }
 .vn-text {
-  font-size: clamp(16px, 2.5vw, 28px) !important; /* 대사 크기 시원하게 확대 */
+  font-size: clamp(16px, 2.5vw, 28px) !important;
   line-height: 1.6 !important;
   width: 100% !important;
   word-break: keep-all !important;
@@ -1023,22 +1074,24 @@ html, body {
   white-space: pre-wrap !important;
 }
 
-/* ── 우측 초상화 영역 (크기 확대) ── */
+/* ── 포트레이트 영역 (정방형) ── */
 .vn-portrait {
-  width: 25% !important; /* 나머지 25% 공간 사용 */
+  flex-shrink: 0 !important;
+  aspect-ratio: 1 / 1 !important;
   height: 100% !important;
-  padding: 5% 8% 5% 2% !important; /* 우측 테두리에 닿지 않도록 여백 설정 */
+  width: auto !important;
+  padding: 4% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   box-sizing: border-box !important;
+  background: rgba(0,0,0,0.3) !important;
 }
 .vn-portrait img {
-  max-width: 100% !important;
-  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: contain !important;
-  transform: scale(1.6) !important; /* 원본 이미지 자체의 투명 여백을 뚫고 1.6배 강제 확대 */
-  transform-origin: center center !important;
+  transform: none !important;
 }
 
 /* ── 버튼 및 팝업창 줄바꿈 교정 ── */
@@ -1061,8 +1114,8 @@ html, body {
   .char-card img { max-height: 20vh; }
   
   /* 비주얼 노벨 최적화 */
-  .vn-portrait { width: clamp(50px, 15vw, 80px); height: clamp(50px, 15vw, 80px); padding: 2%; }
-  .vn-speaker { font-size: 12px !important; }
+  .vn-portrait { aspect-ratio: 1/1 !important; height: 100% !important; width: auto !important; padding: 2% !important; }
+  .vn-speaker-badge { font-size: 12px !important; }
   .vn-text { font-size: 13px !important; line-height: 1.4 !important; }
   
   /* 배틀 화면 캐릭터 및 UI 축소 */
@@ -1342,9 +1395,7 @@ html, body {
 .char-desc { margin-top: 6px; }
 .char-select-btn { margin-top: 4%; }
 
-/* 3) 비주얼노벨 — 화자 이름 첫 글자가 프레임 장식에 가려 잘리는 문제
-      (가로 화면=낮은 높이일 때 왼쪽 여백이 5%로 줄어드는 규칙까지 덮어씀) */
-.vn-text-area { padding-left: 11% !important; }
+/* 3) 비주얼노벨 — CSS 프레임으로 교체되어 이미지 프레임용 패딩 핵 불필요 */
 
 /* 4) 튜토리얼 안내 — 줄 간격이 너무 떠 보이는 현상 살짝 정리 */
 .tutorial-box p  { line-height: 1.65 !important; }
@@ -1354,10 +1405,8 @@ html, body {
    ⚠️ style.css "맨 끝"(기존 폴리시 블록 아래)에 추가
    ============================================================ */
 
-/* (A) 지난 보정 되돌리기: 본문 폭을 좁히던 11% 왼쪽 패딩 → 정상값 복귀
-       + 대사가 길어도 프레임 밖으로 넘치지 않게 내부에서 처리 */
+/* (A) 이미지 프레임 제거로 아래 padding-left 핵 불필요 */
 .vn-text-area {
-  padding-left: 10% !important;  /* 8%에서 10%로 약간 늘려 테두리 침범 방지 */
   overflow-y: auto !important;
   min-height: 0 !important;
 }
@@ -1385,20 +1434,17 @@ html, body {
   padding-right: 5% !important; 
 }
 
-/* 4. 텍스트 크기 완벽 복구 (제가 엄청 크게 줬던 5vh → 원래 비율인 3vh 대역으로 축소) */
+/* 4. 텍스트 크기 (모바일 기준) */
 .vn-text {
   width: 100% !important;
   max-height: 100% !important;
   word-break: keep-all !important;
   overflow-wrap: break-word !important;
-  
-  /* 👇 14px~22px로 잘못 드렸던 5vh를 원래의 아담한 사이즈로 정상화 */
   font-size: clamp(11px, 3.5vh, 16px) !important;
   line-height: 1.5 !important;
 }
 
-.vn-speaker {
-  /* 👇 화자 이름도 대사보다 살짝 작고 정갈하게 복구 */
+.vn-speaker-badge {
   font-size: clamp(10px, 3vh, 14px) !important;
   margin-bottom: 4px !important;
 }
@@ -1407,17 +1453,14 @@ html, body {
 ===================================================== */
 
 /* 1. 전체 영역 폰트 사이즈 자동 조절 방지 */
-html, body, .vn-text-area, .vn-text, .vn-speaker {
+html, body, .vn-text-area, .vn-text, .vn-speaker-badge {
   -webkit-text-size-adjust: 100% !important;
   text-size-adjust: 100% !important;
 }
 
 /* 2. 사파리 폰트 확대 강제 비활성화 핵(Hack) */
-.vn-text, .vn-speaker {
-  /* 사파리가 텍스트 영역의 한계를 인식하도록 유도하여 폰트 확대를 끔 */
+.vn-text, .vn-speaker-badge {
   max-height: 999999px !important; 
-  
-  /* Flexbox 내부에서 텍스트 블록의 넓이 계산 버그 방지 */
   display: block !important;
   width: 100% !important; 
 }
@@ -1431,8 +1474,7 @@ html, body, .vn-text-area, .vn-text, .vn-speaker {
     font-size: clamp(16px, 2.5vw, 28px) !important;
     line-height: 1.6 !important;
   }
-  .vn-speaker {
+  .vn-speaker-badge {
     font-size: clamp(14px, 2vw, 24px) !important;
-    margin-bottom: 2% !important;
   }
 }

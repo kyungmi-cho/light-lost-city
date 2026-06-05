@@ -161,31 +161,35 @@ if (portraitKey && CONFIG.IMAGES.DIALOG[portraitKey]) {
     this.typeText(document.getElementById('vn-text'), scene.text);
   },
 
-  typeText(el, text) {
-    if (this.typeTimer) clearInterval(this.typeTimer);
-    el.textContent = '';
-    this.isTyping = true;
-    let i = 0;
-    this.typeTimer = setInterval(() => {
-      el.textContent += text[i];
-      i++;
-      if (i >= text.length) {
-        clearInterval(this.typeTimer);
-        this.isTyping = false;
-      }
-    }, 40);
-  },
-
-  next() {
-    if (this.isTyping) {
-      // 타이핑 중이면 전체 출력
-      if (this.typeTimer) clearInterval(this.typeTimer);
-      const scene = this.scenes[this.currentIdx];
-      document.getElementById('vn-text').textContent = scene.text.replace(/\[NICKNAME\]/g, GameState.nickname);
+  // 수정 후
+typeText(el, text) {
+  if (this.typeTimer) clearInterval(this.typeTimer);
+  el.textContent = '';
+  this.isTyping = true;
+  const scrollArea = el.closest('.vn-text-area'); // ← 스크롤 영역 참조
+  let i = 0;
+  this.typeTimer = setInterval(() => {
+    el.textContent += text[i];
+    i++;
+    if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight; // ← 최하단 추적
+    if (i >= text.length) {
+      clearInterval(this.typeTimer);
       this.isTyping = false;
-      return;
     }
-    this.currentIdx++;
-    this.renderScene();
+  }, 40);
+},
+
+  // 수정 후
+next() {
+  if (this.isTyping) {
+    if (this.typeTimer) clearInterval(this.typeTimer);
+    const scene = this.scenes[this.currentIdx];
+    const textEl = document.getElementById('vn-text');
+    const scrollArea = textEl.closest('.vn-text-area');
+    textEl.textContent = scene.text.replace(/\[NICKNAME\]/g, GameState.nickname);
+    if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight; // ← 전체 출력 후 최하단
+    this.isTyping = false;
+    return;
   }
-};
+}
+}

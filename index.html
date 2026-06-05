@@ -138,12 +138,21 @@
     <img id="vn-bg-char" class="vn-bg-char" src="" alt="">
     <button class="vn-skip-btn" id="vn-skip-btn">SKIP ▶▶</button>
     <div class="vn-dialog-wrap">
+      <!-- 화자 이름 뱃지 (프레임 위에 겹침) -->
+      <div class="vn-speaker-badge" id="vn-speaker"></div>
       <div class="vn-dialog-frame">
-        <img class="vn-frame-bg" src="images/ui/ui_dialog_frame.png" alt="">
+        <!-- 모서리 삼각 장식 -->
+        <div class="vn-corner tl"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 14,0 0,14" fill="#FFD700"/></svg></div>
+        <div class="vn-corner tr"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 14,0 0,14" fill="#FFD700"/></svg></div>
+        <div class="vn-corner bl"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 14,0 0,14" fill="#FFD700"/></svg></div>
+        <div class="vn-corner br"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 14,0 0,14" fill="#FFD700"/></svg></div>
+        <!-- 텍스트 영역 (내부 스크롤) -->
         <div class="vn-text-area">
-          <div class="vn-speaker" id="vn-speaker"></div>
           <div class="vn-text" id="vn-text"></div>
         </div>
+        <!-- 구분선 -->
+        <div class="vn-divider"></div>
+        <!-- 포트레이트 (정방형) -->
         <div class="vn-portrait">
           <img id="vn-portrait-img" src="" alt="">
         </div>

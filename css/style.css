@@ -53,14 +53,11 @@ html, body {
   text-size-adjust: 100%;
 }
 
-/* ── 게임 컨테이너 (항상 16:9 유지 + iOS 툴바 짤림 완벽 방지) ── */
-/* style.css 약 34번째 줄 부근 */
+/* ── 게임 컨테이너 (16:9 가로 고정) ── */
 #game-container {
   position: fixed;
-  /* 👇 top, left, transform을 지우고 아래처럼 4면을 0으로 당긴 뒤 margin: auto를 줍니다 */
   top: 0; left: 0; right: 0; bottom: 0;
   margin: auto;
-  
   width: 100vw; height: 56.25vw;
   max-height: calc(var(--vh, 1vh) * 100);
   max-width: calc(var(--vh, 1vh) * 177.78);
@@ -121,8 +118,26 @@ html, body {
   width: 100%; height: 100%;
   object-fit: cover;
 }
-.title-text-layer { opacity: 0; animation: fadeIn 1.5s ease 0.5s forwards; }
+/* 타이틀 텍스트: inset:0 상속 해제 후 명시적 크기 지정 */
+.title-text-layer {
+  inset: auto;
+  top: 8%;
+  left: 50%; transform: translateX(-50%);
+  width: 62%;
+  height: auto;        /* ← 누락됐던 핵심 한 줄 */
+  aspect-ratio: 769 / 252;
+  object-fit: fill;
+  opacity: 0;
+  animation: fadeIn 1.5s ease 0.5s forwards;
+}
 .title-press-layer {
+  inset: auto;
+  bottom: 6%;
+  left: 50%; transform: translateX(-50%);
+  width: 46%;
+  height: auto;        /* ← 누락됐던 핵심 한 줄 */
+  aspect-ratio: 765 / 100;
+  object-fit: fill;
   opacity: 0;
   animation: fadeIn 0.5s ease 2s forwards, blink 1s step-end 2.5s infinite;
 }
@@ -380,6 +395,7 @@ html, body {
     inset 0 0 0 1px rgba(255,215,0,0.1);
   border-radius: 2px;
   min-height: 14vh;
+  overflow: hidden;
 }
 
 /* 모서리 삼각 장식 */
@@ -448,13 +464,13 @@ html, body {
 
 /* 포트레이트 — 정방형 (이미지 비율 자동 유지) */
 .vn-portrait {
+  position: relative; z-index: 2;
   flex-shrink: 0;
-  width: clamp(80px, 12vw, 220px) !important;
   aspect-ratio: 1 / 1;
-  height: auto;
+  height: 100%;
   display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,0.3);
-  padding: 4%;
+  padding: 1%;
   box-sizing: border-box;
 }
 .vn-portrait img {
@@ -471,6 +487,8 @@ html, body {
   z-index: 3;
 }
 /* style.css — .vn-skip-btn 바로 위에 추가 */
+.vn-dialog-wrap { pointer-events: none; }
+
 .vn-skip-btn {
   pointer-events: auto; /* ← 이 줄을 기존 블록 안에 추가 */
   position: absolute;
@@ -1078,9 +1096,9 @@ html, body {
 /* ── 포트레이트 영역 (정방형) ── */
 .vn-portrait {
   flex-shrink: 0 !important;
-  width: clamp(80px, 12vw, 220px) !important;
   aspect-ratio: 1 / 1 !important;
-  height: auto !important;
+  width: clamp(80px, 12vw, 220px) !important;  /* ← 교체 */
+  height: auto !important;                      /* ← 교체 */
   padding: 1% !important;
   display: flex !important;
   align-items: center !important;
@@ -1109,7 +1127,6 @@ html, body {
    수정: 반응형 모바일 최적화 (5번 문제 해결)
 ===================================================== */
 @media (max-width: 640px) {
-  .vn-portrait { width: clamp(60px, 10vh, 100px) !important; }
   /* 캐릭터 카드 최적화 */
   .char-desc { display: none; }
   .char-name { font-size: 11px; }
@@ -1483,4 +1500,263 @@ html, body, .vn-text-area, .vn-text, .vn-speaker-badge {
   .vn-speaker-badge {
     font-size: clamp(14px, 2vw, 24px) !important;
   }
+}
+/* =====================================================
+   📱 세로 모드 (Portrait) 전용 레이아웃
+   대상: 모바일 세로 / 태블릿 세로
+   - dvh: 브라우저 주소창·탭바 자동 제외
+   - env(safe-area-inset-*): 노치·홈바·펀치홀 자동 여백
+===================================================== */
+@media (orientation: portrait) {
+
+  /* ── 게임 컨테이너: 세로 전체화면 ── */
+  #game-container {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    max-width: none;
+  }
+
+  /* ── 화면 공통: flex 지원 ── */
+  #screen-clear.active,
+  #screen-gameover.active,
+  #screen-roulette.active,
+  #screen-login.active,
+  #screen-character.active,
+  #screen-reward.active { display: flex; }
+
+  /* ════════════════════════════
+     2. 타이틀
+  ════════════════════════════ */
+  /* 배경 img는 JS가 M_bg_title.png 로 교체 */
+  .title-layer { object-position: center top; }
+
+  /* 수정 */
+.title-text-layer {
+  width: 90%;
+  top: 20dvh;    /* 화면 높이의 9% 아래로 */
+}
+.title-press-layer {
+  width: 82%;
+  bottom: 25dvh;  /* 화면 높이의 11% 위로 */
+}
+
+  /* ════════════════════════════
+     3. 캐릭터 선택
+  ════════════════════════════ */
+  #screen-character {
+    padding-top: max(env(safe-area-inset-top), 12px);
+    padding-bottom: max(env(safe-area-inset-bottom), 12px);
+  }
+  .char-select-title { font-size: clamp(13px, 4.5vw, 22px); margin-bottom: 3%; }
+  .char-cards {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3% 4%;
+    width: 96%;
+  }
+  .char-card {
+    max-width: 42%;
+    flex: 0 0 42%;
+  }
+  .char-card img { max-height: 16vh; }
+  .char-select-btn { font-size: clamp(12px, 3.5vw, 18px); padding: 3% 8%; margin-top: 10%; }
+
+  /* ════════════════════════════
+     4. 닉네임 룰렛
+  ════════════════════════════ */
+  #screen-roulette {
+    padding-top: max(env(safe-area-inset-top), 12px);
+    padding-bottom: max(env(safe-area-inset-bottom), 12px);
+  }
+  .roulette-title { font-size: clamp(13px, 4vw, 22px); }
+  .roulette-name  { font-size: clamp(15px, 5vw, 28px); }
+
+  /* ════════════════════════════
+     5. 로그인
+  ════════════════════════════ */
+  #screen-login {
+    padding-top: max(env(safe-area-inset-top), 12px);
+    padding-bottom: max(env(safe-area-inset-bottom), 12px);
+  }
+  .login-box { width: min(420px, 90%); padding: 6% 5%; }
+
+  /* ════════════════════════════
+     6. 비주얼 노벨
+  ════════════════════════════ */
+  .vn-skip-btn {
+    top: max(env(safe-area-inset-top), 8px);
+    right: max(env(safe-area-inset-right), 8px);
+  }
+  /* 대화창 위치: safe-area + 여유 여백으로 올림 */
+  .vn-dialog-wrap {
+    width: 96%;
+    bottom: max(env(safe-area-inset-bottom) + 8px, 150px);
+  }
+  .vn-dialog-frame { min-height: 22vw; }
+  /* 스탠딩 캐릭터: 대화창이 차지하는 높이(~28%) + 여유분만큼 올림 */
+  .vn-bg-char {
+    bottom: 35% !important;
+    height: 52% !important;
+  }
+  .vn-portrait {
+    width: clamp(60px, 18vw, 110px) !important;
+    height: auto !important;
+  }
+  .vn-text {
+    font-size: clamp(12px, 3.2vw, 18px) !important;
+    line-height: 1.6 !important;
+  }
+  .vn-speaker-badge {
+    font-size: clamp(10px, 2.8vw, 14px) !important;
+  }
+
+  /* ════════════════════════════
+     7. 배틀
+  ════════════════════════════ */
+
+  /* 배경은 JS가 M_bg_battle_lvX.png 로 교체 */
+
+  /* 상단 HP · 타이머 · 목숨 — 한 줄 유지, 컴팩트하게 */
+  .battle-ui-top {
+    padding-top:    max(env(safe-area-inset-top), 6px);
+    padding-left:   max(env(safe-area-inset-left), 2%);
+    padding-right:  max(env(safe-area-inset-right), 2%);
+    padding-bottom: 4px;
+    gap: 2%;
+    align-items: center;
+  }
+  .hp-panel {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 7px;
+    border-width: 1px;
+  }
+  .hp-name        { font-size: clamp(8px, 2.4vw, 11px); margin-bottom: 2px; }
+  .hp-text        { font-size: clamp(7px, 1.8vw, 9px); margin-top: 1px; }
+  .hp-bar-wrap    { height: 7px; }
+  .timer-panel    { flex-shrink: 0; padding: 3px 8px; border-width: 1px; }
+  .timer-label    { font-size: clamp(7px, 2vw, 9px); }
+  .timer-value    { font-size: clamp(13px, 4.5vw, 22px); }
+  .lives-panel    { flex-shrink: 0; padding: 4px 6px; border-width: 1px; }
+  .life-icon      { font-size: clamp(11px, 3.5vw, 16px); }
+
+  /* 빌런: 화면 중앙 상단 */
+  .battle-villain {
+  left: 60%;
+  right: auto;
+  transform: translateX(-50%);
+    bottom: 42%;             /* 42% → 34% 아래로 내려 중앙 쪽으로 */
+  height: clamp(110px, 30vw, 240px);   /* 22vw → 30vw 확대 */
+}
+  .battle-villain.boss {
+    height: clamp(140px, 40vw, 300px) !important;
+    bottom: 32%;
+  }
+
+  /* 플레이어: 좌하단 */
+  .battle-player {
+  left: 10%;
+  bottom: 19%;             /* 13% → 19% 위로 올려 중앙 쪽으로 */
+  height: clamp(100px, 27vw, 210px);   /* 21vw → 27vw 확대 */
+}
+
+  /* 콤보 */
+  .combo-display {
+    left: 4%;
+    bottom: 38%;
+    font-size: clamp(12px, 4vw, 20px);
+  }
+
+  /* 퀴즈 모달 */
+  .quiz-modal {
+  align-items: center;     /* flex-end → center 로 변경 */
+  padding-bottom: 0;
+}
+.quiz-box {
+  width: 96%;
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+    padding: 4% 5%;
+    border-radius: 12px;    /* 모든 모서리 동일하게 */
+}
+  .quiz-progress  { font-size: clamp(9px, 2.5vw, 12px); }
+  .quiz-question  { font-size: clamp(13px, 3.8vw, 18px); margin-bottom: 14px; }
+  .quiz-option    { font-size: clamp(12px, 3.2vw, 16px); padding: 10px 12px; }
+  .quiz-ox        { gap: 12%; }
+  .quiz-ox-btn    { width: 24%; }
+  .quiz-hint-btn  { font-size: clamp(10px, 2.8vw, 13px); }
+  .hint-panel     { font-size: clamp(10px, 2.8vw, 14px); }
+  .hint-panel iframe {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 9 / 16;
+    max-height: 40dvh;
+  }
+  .quiz-explanation { font-size: clamp(9px, 2.5vw, 13px); }
+
+  /* 튜토리얼 · 카운트다운 */
+  .tutorial-box {
+    width: 88%;
+    max-width: none;
+    padding: 5% 6%;
+  }
+  .tutorial-box h3 { font-size: clamp(13px, 4vw, 20px); }
+  .tutorial-box p  { font-size: clamp(11px, 3.2vw, 15px); }
+
+  /* ════════════════════════════
+     8. 레벨 클리어
+  ════════════════════════════ */
+  #screen-clear {
+    padding: max(env(safe-area-inset-top), 10px) 5%
+             max(env(safe-area-inset-bottom), 10px);
+  }
+  .clear-title         { font-size: clamp(18px, 6.5vw, 36px); }
+  .clear-villain-quote { max-width: 90%; font-size: clamp(11px, 3.2vw, 16px); }
+  .clear-stat          { font-size: clamp(12px, 3.5vw, 18px); }
+  .btn-next-level      { font-size: clamp(12px, 3.5vw, 18px); padding: 3% 10%; }
+
+  /* ════════════════════════════
+     9. 게임 오버
+  ════════════════════════════ */
+  #screen-gameover {
+    padding: max(env(safe-area-inset-top), 10px) 5%
+             max(env(safe-area-inset-bottom), 10px);
+  }
+  .gameover-title { font-size: clamp(22px, 8vw, 50px); }
+  .gameover-msg   { max-width: 92%; font-size: clamp(12px, 3.5vw, 18px); }
+  .gameover-btns  { flex-direction: column; align-items: center; gap: 12px; }
+  .btn-retry, .btn-restart { font-size: clamp(12px, 3.5vw, 18px); padding: 3% 8%; }
+
+  /* ════════════════════════════
+     11. 보상 화면
+  ════════════════════════════ */
+  #screen-reward {
+    padding: max(env(safe-area-inset-top), 10px) 4%
+             max(env(safe-area-inset-bottom), 10px);
+    gap: 2%;
+  }
+  .master-badge    { width: min(88vw, 380px); }
+  .badge-nickname  { font-size: clamp(13px, 4vw, 22px); }
+  .reward-msg      { font-size: clamp(11px, 3vw, 15px); padding: 0 4%; text-align: center; }
+  .reward-coupon   { font-size: clamp(10px, 2.8vw, 14px); width: 90%; }
+
+  /* ════════════════════════════
+     공통 UI
+  ════════════════════════════ */
+  /* 뮤트 버튼: 좌하단으로 이동 (우하단은 포트레이트 썸네일과 겹침) */
+  .mute-btn {
+    bottom: max(env(safe-area-inset-bottom), 14px);
+    right:  auto;
+    left:   max(env(safe-area-inset-left), 8px);
+    width:  clamp(32px, 8.5vw, 44px);
+    height: clamp(32px, 8.5vw, 44px);
+    font-size: clamp(14px, 4vw, 22px);
+  }
+
+  /* 팝업 */
+  .popup-box  { width: 88%; }
+  .popup-title { font-size: clamp(13px, 4vw, 20px); }
+  .popup-msg   { font-size: clamp(11px, 3vw, 15px); }
 }

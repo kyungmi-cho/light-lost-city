@@ -448,10 +448,10 @@ html, body {
 
 /* 포트레이트 — 정방형 (이미지 비율 자동 유지) */
 .vn-portrait {
-  position: relative; z-index: 2;
   flex-shrink: 0;
+  width: clamp(80px, 12vw, 220px) !important;
   aspect-ratio: 1 / 1;
-  height: 100%;
+  height: auto;
   display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,0.3);
   padding: 4%;
@@ -1078,10 +1078,10 @@ html, body {
 /* ── 포트레이트 영역 (정방형) ── */
 .vn-portrait {
   flex-shrink: 0 !important;
+  width: clamp(80px, 12vw, 220px) !important;
   aspect-ratio: 1 / 1 !important;
-  height: 100% !important;
-  width: auto !important;
-  padding: 4% !important;
+  height: auto !important;
+  padding: 1% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1109,6 +1109,7 @@ html, body {
    수정: 반응형 모바일 최적화 (5번 문제 해결)
 ===================================================== */
 @media (max-width: 640px) {
+  .vn-portrait { width: clamp(60px, 10vh, 100px) !important; }
   /* 캐릭터 카드 최적화 */
   .char-desc { display: none; }
   .char-name { font-size: 11px; }

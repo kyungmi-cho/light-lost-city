@@ -80,9 +80,9 @@ const CONFIG = {
 
   SOUNDS: {
     BGM: {
-      START:   'sounds/bgm/BGM_START.wav',
+      START:   'sounds/bgm/BGM_START.mp3',
       CHARACTER_SELECT: 'audio/SFX_caracter.mp3',
-      OPENING: 'sounds/bgm/BGM_OPENING.wav',
+      OPENING: 'sounds/bgm/BGM_OPENING.mp3',
       BATTLE:  'sounds/bgm/BGM_BATTLE.mp3',
       BOSS:    'sounds/bgm/BGM_BOSS_BATTLE.mp3',
       ENDING:  'sounds/bgm/BGM_ENDING.mp3',

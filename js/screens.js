@@ -86,28 +86,52 @@ const Screens = {
     const marketingCheck = document.getElementById('check-marketing');
 
     startBtn.onclick = async () => {
-  const userId = userIdInput.value.trim();
-  if (!userId) {
-    userIdInput.focus();
-    userIdInput.style.borderColor = 'var(--c-red)';
-    setTimeout(() => userIdInput.style.borderColor = '', 1500);
-    return;
-  }
-  AudioManager.playSFX(CONFIG.SOUNDS.SFX.START_BTN);
-  GameState.userId = userId;
-  GameState.marketing = marketingCheck.checked;
-  GameState.isGuest = false;
-  if (GameState.marketing) GameState.lives += CONFIG.GAME.MARKETING_BONUS_LIVES;
-  await this.startGame();
-};
+      const userId = userIdInput.value.trim();
+      if (!userId) {
+        userIdInput.focus();
+        userIdInput.style.borderColor = 'var(--c-red)';
+        setTimeout(() => userIdInput.style.borderColor = '', 1500);
+        return;
+      }
+      AudioManager.playSFX(CONFIG.SOUNDS.SFX.START_BTN);
+      GameState.userId = userId;
+      GameState.marketing = marketingCheck.checked;
+      GameState.isGuest = false;
+      if (GameState.marketing) GameState.lives += CONFIG.GAME.MARKETING_BONUS_LIVES;
 
-guestBtn.onclick = () => {
-  if (!confirm('Guest로 진행하면 할인쿠폰 및 이벤트 혜택을 받을 수 없습니다.\n그래도 진행하시겠습니까?')) return;
-  AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK);
-  GameState.isGuest = true;
-  GameState.userId = 'Guest';
-  this.startGame();
-};
+      // 🔥 [추가된 부분] 게임 시작 버튼을 누르면 구글 시트로 시작 로그 전송
+      API.saveLog({
+        nickname: GameState.nickname,
+        userId: GameState.userId,
+        marketing: GameState.marketing,
+        character: GameState.character,
+        level: 1,
+        cleared: false,
+        playTime: 0
+      });
+
+      await this.startGame();
+    };
+
+    guestBtn.onclick = () => {
+      if (!confirm('Guest로 진행하면 할인쿠폰 및 이벤트 혜택을 받을 수 없습니다.\n그래도 진행하시겠습니까?')) return;
+      AudioManager.playSFX(CONFIG.SOUNDS.SFX.CLICK);
+      GameState.isGuest = true;
+      GameState.userId = 'Guest';
+
+      // 🔥 [추가된 부분] Guest 시작 버튼을 누르면 구글 시트로 시작 로그 전송
+      API.saveLog({
+        nickname: GameState.nickname,
+        userId: GameState.userId,
+        marketing: false,
+        character: GameState.character,
+        level: 1,
+        cleared: false,
+        playTime: 0
+      });
+
+      this.startGame();
+    };
   },
 
   // ── 게임 시작 (오프닝) ──
